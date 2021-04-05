@@ -27,6 +27,11 @@ public class CartItem implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "bill_id")
+    private Bill bill;
+
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
