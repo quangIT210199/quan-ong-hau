@@ -1,16 +1,17 @@
 package com.codelovers.quanonghau.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
-@Data
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -20,31 +21,45 @@ public class User implements Serializable {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "user_name", nullable = false)
-    private String userName;
+    @Column(name = "user_name",length = 64,nullable = false)
+    private String username;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email",length = 128, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password",length = 64, nullable = false)
     private String password;
+
+    @Column(name = "photo", length = 64)
+    private String photo;
 
     @Column(name = "phone_number")
     private int phoneNumber;
 
-    @Column(name = "status")
-    private int status;
+    @Column(name = "enabled")
+    private boolean enabled;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<CartItem> cartItems = new ArrayList<>();
 
-    @ManyToMany
+    @Fetch(FetchMode.JOIN)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name ="user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
+
+    public User() {
+    }
+
+//    public User(String email, String password, String userName) {
+//        this.email = email;
+//        this.password = password;
+//        this.username = userName;
+//    }
+
 
     public Integer getId() {
         return id;
@@ -54,12 +69,12 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -78,6 +93,14 @@ public class User implements Serializable {
         this.password = password;
     }
 
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
     public int getPhoneNumber() {
         return phoneNumber;
     }
@@ -86,12 +109,12 @@ public class User implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
-    public int getStatus() {
-        return status;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public List<CartItem> getCartItems() {
@@ -102,11 +125,11 @@ public class User implements Serializable {
         this.cartItems = cartItems;
     }
 
-    public List<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 }

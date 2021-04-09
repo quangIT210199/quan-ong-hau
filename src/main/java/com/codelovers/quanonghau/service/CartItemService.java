@@ -15,4 +15,8 @@ public interface CartItemService {
     float updateQuantity(Integer quantity, Integer productId, Integer userId);
 
     void removeProductAndUser(Integer productId, Integer userId);
+
+    void updateBillId(Integer billId, Integer[] cartIds);
+
+    CartItem findByIdAndUser(Integer cartID, int userId);
 }

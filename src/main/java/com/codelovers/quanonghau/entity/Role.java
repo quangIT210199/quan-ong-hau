@@ -1,15 +1,12 @@
 package com.codelovers.quanonghau.entity;
 
-import lombok.Data;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "role")
-@Data
 public class Role implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -22,8 +19,8 @@ public class Role implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToMany(mappedBy = "roles")
-    private List<User> users = new ArrayList<>();
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    private Set<User> users = new HashSet<>();
 
     public Integer getId() {
         return id;
@@ -41,11 +38,11 @@ public class Role implements Serializable {
         this.name = name;
     }
 
-    public List<User> getUsers() {
+    public Set<User> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(Set<User> users) {
         this.users = users;
     }
 }

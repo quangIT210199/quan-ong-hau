@@ -9,6 +9,8 @@ import com.codelovers.quanonghau.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +30,8 @@ public class ShoppingCartRestController {
 
     // Show shopping Cart
     @GetMapping(value = "/cart/{uid}", produces = "application/json")
-    public ResponseEntity<?> showShoppingCart(@PathVariable(name = "uid") Integer uid){
+    public ResponseEntity<?> showShoppingCart(@PathVariable(name = "uid") Integer uid,
+                                              @AuthenticationPrincipal Authentication authentication){
         // Need to code authen for get user instance
         //User user = userSer.getCurrentlyLoggedInUser(authentication);
         // And here need use uid
@@ -51,7 +54,7 @@ public class ShoppingCartRestController {
     public ResponseEntity<?> addProductToCart(@PathVariable(name = "pid") Integer pid, @PathVariable(name = "uid") Integer uid,
                                                 @PathVariable(name = "qty") Integer qty){
         User user = userSer.findById(uid);
-        if(user == null){
+        if(user == null){ // check user
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 

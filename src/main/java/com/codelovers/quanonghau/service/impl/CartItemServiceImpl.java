@@ -1,5 +1,6 @@
 package com.codelovers.quanonghau.service.impl;
 
+import com.codelovers.quanonghau.entity.Bill;
 import com.codelovers.quanonghau.entity.CartItem;
 import com.codelovers.quanonghau.entity.Product;
 import com.codelovers.quanonghau.entity.User;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,7 +32,15 @@ public class CartItemServiceImpl implements CartItemService {
     public List<CartItem> listCartItems(User user) {
 
         int id = user.getId();
+
+        // Cần check xem các Cart_item nào đã vào Bill chưa
         List<CartItem> cartItems = cartItemRepo.findAllByUser_Id(id);
+//        for (CartItem cartItem: cartItems){
+//            if(cartItem.getBill() != null){ // Đã tồn tại ở bill khác rồi
+//                cartItems.remove(cartItem);
+//            }
+//        }
+
         return cartItems;
     }
 
@@ -41,10 +51,10 @@ public class CartItemServiceImpl implements CartItemService {
         Product product = productRepo.findById(productId).get();
 
         User user = userRepo.findById(userId).get();
+        // Check xem giỏ hàng tồn tại và trạng thái có Bill chưa
+        CartItem cartItem = cartItemRepo.findByProductAndUserAndBill(product, user, null);
 
-        CartItem cartItem = cartItemRepo.findByProductAndUser(product, user);
-
-        if(cartItem != null){
+        if(cartItem != null){ // giỏ hàng tồn tại
             addedQuantity = cartItem.getQuantity() + quantity;
             cartItem.setQuantity(addedQuantity);
         }
@@ -76,5 +86,25 @@ public class CartItemServiceImpl implements CartItemService {
     public void removeProductAndUser(Integer productId, Integer userId) {
 
         cartItemRepo.deleteProductAndUser(productId, userId);
+    }
+
+    @Override
+    public void updateBillId(Integer billId, Integer[] cartIds) {
+        System.out.println("Bill id: " + billId);
+
+        for (Integer c : cartIds){
+            cartItemRepo.updateBillId(billId, c);
+        }
+    }
+
+    @Override
+    public CartItem findByIdAndUser(Integer cartID, int userId) {
+        CartItem cartItem = cartItemRepo.findById(cartID).get();
+        if(cartItem == null){
+            return null;
+        }
+        User user = userRepo.findById(userId).get();
+
+        return cartItemRepo.findByIdAndUser(cartID, user);
     }
 }
