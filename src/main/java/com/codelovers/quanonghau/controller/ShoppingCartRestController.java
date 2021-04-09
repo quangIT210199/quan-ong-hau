@@ -30,8 +30,8 @@ public class ShoppingCartRestController {
 
     // Show shopping Cart
     @GetMapping(value = "/cart/{uid}", produces = "application/json")
-    public ResponseEntity<?> showShoppingCart(@PathVariable(name = "uid") Integer uid,
-                                              @AuthenticationPrincipal Authentication authentication){
+    public ResponseEntity<?> showShoppingCart(@PathVariable(name = "uid") Integer uid
+                                              ){
         // Need to code authen for get user instance
         //User user = userSer.getCurrentlyLoggedInUser(authentication);
         // And here need use uid

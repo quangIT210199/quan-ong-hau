@@ -36,8 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Lấy jwt khi có request đi qua filter
             String jwt = getJwtFromRequest(request);
             System.out.println("jwt client: " + jwt);
-            // Kiểm tra token null or empty và check jwt hợp lệ ko bằng JWT_SECRET
-            // Nếu k vô if chạy thẳng dispathcher từ Http vào Controller tạo token
+
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 System.out.println("vch @@ jwt client gửi nè: " + jwt);
                 //Vì tích hợp id vô token lên cần lấy id ra
@@ -59,10 +58,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    System.out.println("fail ở đây 3");
                 }
             }
-            System.out.println("nà ní");
         } catch (Exception ex) {
             log.error("failed on set user authentication", ex);
         }

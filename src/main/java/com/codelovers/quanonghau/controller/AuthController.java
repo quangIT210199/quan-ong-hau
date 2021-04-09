@@ -32,13 +32,11 @@ public class AuthController {
 
     @PostMapping(value = "/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
-        System.out.println("Controller login: " + loginRequest.getUsername());
-        System.out.println("Controller login: " + loginRequest.getPassword());
 
         // Check authen
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(),
+                    loginRequest.getEmail(),
                     loginRequest.getPassword()
             )
         );
@@ -58,5 +56,4 @@ public class AuthController {
         return new ResponseEntity<>(new LoginResponse(jwt,
                 customUserDetails.getUser().getId(), customUserDetails.getUsername(), roles), HttpStatus.OK);
     }
-
 }

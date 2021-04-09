@@ -49,7 +49,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        System.out.println(user.getEmail());
         return user.getEmail();
     }
 

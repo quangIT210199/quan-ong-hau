@@ -19,19 +19,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        // 1. Load the user from the users table by username. If not found, throw UsernameNotFoundException.
-        // 2. Convert/wrap the user to a UserDetails object and return it.
-        // Tham số truyền vào chỉ có username người dùng
-        // Kiểm tra xem user có tồn tại trong database không?
+        // Check field of User not null
         User user = userRepo.getUserByEmail(username);
-        System.out.println(user.getEmail());
-        System.out.println(user.getPassword());
+
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
-//        return new CustomUserDetails(user);
 
-//        return CustomUserDetails.build(user);
         return new CustomUserDetails(user);
     }
 
@@ -44,17 +38,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return new CustomUserDetails(user);
     }
 
-//    public User getCurrentlyLoggedInUser(Authentication authentication){
-//        if(authentication == null)
-//            return null;
-//
-//        User user = null;
-//        Object principal = authentication.getPrincipal();
-//
-//        if(principal instanceof CustomUserDetails){
-//            user = ((CustomUserDetails) principal).getUser();
-//        }
-//
-//        return user;
-//    }
+    public User getCurrentlyLoggedInUser(Authentication authentication){
+        if(authentication == null)
+            return null;
+
+        User user = null;
+        Object principal = authentication.getPrincipal();
+
+        if(principal instanceof CustomUserDetails){
+            user = ((CustomUserDetails) principal).getUser();
+        }
+
+        return user;
+    }
 }

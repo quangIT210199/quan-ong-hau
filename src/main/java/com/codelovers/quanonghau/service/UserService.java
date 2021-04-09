@@ -5,4 +5,6 @@ import com.codelovers.quanonghau.entity.User;
 public interface UserService {
 
     User findById(Integer id);
+
+    User findByEmail(String email);
 }
