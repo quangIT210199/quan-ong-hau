@@ -10,13 +10,15 @@ public interface CartItemService {
     List<CartItem> listCartItems(User user);
 
     // add product to Shopping Cart
-    Integer addProduct(Integer productId, Integer quantity, Integer userId);
+    Integer addProduct(Integer productId, Integer quantity, User user);
 
-    float updateQuantity(Integer quantity, Integer productId, Integer userId);
+    float updateQuantity(Integer quantity, Integer productId, User user);
 
-    void removeProductAndUser(Integer productId, Integer userId);
+    void removeProductAndUser(Integer productId, User user);
 
     void updateBillId(Integer billId, Integer[] cartIds);
 
-    CartItem findByIdAndUser(Integer cartID, int userId);
+    CartItem findByIdAndUser(Integer cartID, Integer userId);
+
+    CartItem exitBillId(Integer productId, User user);
 }

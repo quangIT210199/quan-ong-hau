@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,12 +44,11 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public Integer addProduct(Integer productId, Integer quantity, Integer userId) { // Change userId = User user when code authen
+    public Integer addProduct(Integer productId, Integer quantity, User user) { // Change userId = User user when code authen
         Integer addedQuantity = quantity;
 
         Product product = productRepo.findById(productId).get();
 
-        User user = userRepo.findById(userId).get();
         // Check xem giỏ hàng tồn tại và trạng thái có Bill chưa
         CartItem cartItem = cartItemRepo.findByProductAndUserAndBill(product, user, null);
 
@@ -72,9 +70,8 @@ public class CartItemServiceImpl implements CartItemService {
 
     // increasing quantity when click plusBtn
     @Override
-    public float updateQuantity(Integer quantity, Integer productId, Integer userId) {// Change userId = User user when code authen
-
-        cartItemRepo.updateQuantity(quantity, productId, userId);
+    public float updateQuantity(Integer quantity, Integer productId, User user) {// Change userId = User user when code authen
+        cartItemRepo.updateQuantity(quantity, productId, user.getId());
         Product product = productRepo.findById(productId).get();
 
         float subTotal = product.getPrice() * quantity;
@@ -83,9 +80,9 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public void removeProductAndUser(Integer productId, Integer userId) {
+    public void removeProductAndUser(Integer productId, User user) {
 
-        cartItemRepo.deleteProductAndUser(productId, userId);
+        cartItemRepo.deleteProductAndUser(productId, user.getId());
     }
 
     @Override
@@ -98,7 +95,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public CartItem findByIdAndUser(Integer cartID, int userId) {
+    public CartItem findByIdAndUser(Integer cartID, Integer userId) {
         CartItem cartItem = cartItemRepo.findById(cartID).get();
         if(cartItem == null){
             return null;
@@ -106,5 +103,10 @@ public class CartItemServiceImpl implements CartItemService {
         User user = userRepo.findById(userId).get();
 
         return cartItemRepo.findByIdAndUser(cartID, user);
+    }
+
+    @Override
+    public CartItem exitBillId(Integer productId, User user) {
+        return cartItemRepo.exitBillId(productId, user.getId());
     }
 }

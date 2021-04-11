@@ -13,7 +13,9 @@ import java.util.Set;
 
 public class CustomUserDetails implements UserDetails {
 
-//    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+
+    public static final String ROLE = "ROLE_";
 
     private User user;
 
@@ -28,7 +30,7 @@ public class CustomUserDetails implements UserDetails {
         List<SimpleGrantedAuthority> authories = new ArrayList<>();
 
         for (Role role : roles){
-            authories.add(new SimpleGrantedAuthority(role.getName()));
+            authories.add(new SimpleGrantedAuthority(ROLE + role.getName()));
         }
 
         return authories;

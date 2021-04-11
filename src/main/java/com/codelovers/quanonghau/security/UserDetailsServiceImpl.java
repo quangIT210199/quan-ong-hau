@@ -37,18 +37,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         return new CustomUserDetails(user);
     }
-
-    public User getCurrentlyLoggedInUser(Authentication authentication){
-        if(authentication == null)
-            return null;
-
-        User user = null;
-        Object principal = authentication.getPrincipal();
-
-        if(principal instanceof CustomUserDetails){
-            user = ((CustomUserDetails) principal).getUser();
-        }
-
-        return user;
-    }
 }

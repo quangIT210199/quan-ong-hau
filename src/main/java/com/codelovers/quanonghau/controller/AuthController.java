@@ -1,9 +1,14 @@
 package com.codelovers.quanonghau.controller;
 
+import com.codelovers.quanonghau.constants.AuthoritiesConstants;
+import com.codelovers.quanonghau.entity.Role;
+import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.security.CustomUserDetails;
 import com.codelovers.quanonghau.security.jwt.JwtTokenProvider;
 import com.codelovers.quanonghau.security.payload.LoginRequest;
 import com.codelovers.quanonghau.security.payload.LoginResponse;
+import com.codelovers.quanonghau.security.payload.SignupRequest;
+import com.codelovers.quanonghau.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,13 +16,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,10 +31,16 @@ import java.util.stream.Collectors;
 public class AuthController {
 
     @Autowired
-    AuthenticationManager authenticationManager; // Storegare and get authorites in here
+    private AuthenticationManager authenticationManager; // Storegare and get authorites in here
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private UserService userSer;
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     @PostMapping(value = "/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
@@ -40,7 +52,7 @@ public class AuthController {
                     loginRequest.getPassword()
             )
         );
-        System.out.println("Loi tiep");
+
         // If dont have exception -> set information to Spring Security Context
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -55,5 +67,30 @@ public class AuthController {
 
         return new ResponseEntity<>(new LoginResponse(jwt,
                 customUserDetails.getUser().getId(), customUserDetails.getUsername(), roles), HttpStatus.OK);
+    }
+
+    //For User
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@Validated @RequestBody SignupRequest signupRequest){
+        if(userSer.exitUserByUserName(signupRequest.getUsername())){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        if(userSer.exitUserByEmail(signupRequest.getEmail())){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        User user = new User(signupRequest.getEmail(), encoder.encode(signupRequest.getPassword()), signupRequest.getUsername());
+
+        Role role = new Role(AuthoritiesConstants.USER);
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+
+        user.setRoles(roles);
+
+        userSer.createdUser(user);
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 }
