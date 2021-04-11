@@ -42,7 +42,7 @@ public class AuthController {
     @Autowired
     private PasswordEncoder encoder;
 
-    @PostMapping(value = "/login")
+    @PostMapping(value = "/login", produces = "application/json")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
 
         // Check authen
@@ -70,7 +70,7 @@ public class AuthController {
     }
 
     //For User
-    @PostMapping("/signup")
+    @PostMapping(value ="/signup", produces = "application/json")
     public ResponseEntity<?> registerUser(@Validated @RequestBody SignupRequest signupRequest){
         if(userSer.exitUserByUserName(signupRequest.getUsername())){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

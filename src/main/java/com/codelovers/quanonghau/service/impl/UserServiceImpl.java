@@ -56,6 +56,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createdUser(User user) {
         // Need validate fields of User
+        user.setEnabled(true);
+
         return userRepo.save(user);
     }
 }
