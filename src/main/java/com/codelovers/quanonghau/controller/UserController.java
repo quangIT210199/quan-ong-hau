@@ -1,7 +1,6 @@
 package com.codelovers.quanonghau.controller;
 
 import com.codelovers.quanonghau.contrants.AuthoritesContrants;
-import com.codelovers.quanonghau.controller.RequestPojo.ERole;
 import com.codelovers.quanonghau.entity.Role;
 import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.security.payload.SignupRequest;
@@ -11,9 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -99,13 +95,24 @@ public class UserController {
     @PutMapping(value = "/user/save/{id}", produces = "application/json")
     public ResponseEntity<?> saveUser(@PathVariable("id") Integer id ,@RequestBody User user){
         // Mỗi lần call cx phải check email
-        User u = userSer.findById(id);
+//        if(userSer.isEmailUnique(id, user.getEmail())){
+//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//        }
 
+        User u = userSer.findById(id);
+        System.out.println(u.toString());
         if(u == null){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        userSer.updateUser(user);
+        u.setFirstName(user.getFirstName());
+        u.setLastName(user.getLastName());
+        u.setEnabled(user.isEnabled());
+        u.setAddress(user.getAddress());
+        u.setEmail(user.getEmail());
+        u.setPassword(user.getPassword());
+
+        userSer.createdUser(user);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
     }

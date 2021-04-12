@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createdUser(User user) {
+    public User createdUser(User user) { // Func này check cả update nhưng nên tách ra
         // Need validate fields of User
         boolean isUpdatingUser = (user.getId() != null);
         if (isUpdatingUser) {
@@ -91,11 +91,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(User user) {
 
+        encodePassword(user);
+
         return userRepo.save(user);
     }
 
     private void encodePassword(User user) {
-
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
     }
