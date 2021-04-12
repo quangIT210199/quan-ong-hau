@@ -6,6 +6,7 @@ import com.codelovers.quanonghau.security.CustomUserDetails;
 import com.codelovers.quanonghau.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -16,6 +17,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepo;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Override
     public User findById(Integer id) {
@@ -44,8 +48,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean exitUserByEmail(String email) {
-        return userRepo.existsByEmail(email);
+    public boolean isEmailUnique(Integer id, String email) {
+        User userByEmail = userRepo.getUserByEmail(email);
+
+        if(userByEmail == null) return true;
+
+        boolean isCreatingNew = (id == null);
+
+        if(isCreatingNew) {
+            if (userByEmail != null) return false;
+        }
+        else {
+            if(userByEmail.getId() != id){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -54,10 +73,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean exitUserByEmail(String email) {
+        return userRepo.existsByEmail(email);
+    }
+
+    @Override
     public User createdUser(User user) {
         // Need validate fields of User
-        user.setEnabled(true);
+        boolean isUpdatingUser = (user.getId() != null);
+        if (isUpdatingUser) {
+            User existingUser = userRepo.findById(user.getId()).get();
+
+            if (user.getPassword().isEmpty()) {
+                user.setPassword(existingUser.getPassword());
+            } else {
+                encodePassword(user);
+            }
+
+        } else {
+            encodePassword(user);
+        }
 
         return userRepo.save(user);
+    }
+
+    @Override
+    public User updateUser(User user) {
+
+        return userRepo.save(user);
+    }
+
+    private void encodePassword(User user) {
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
     }
 }

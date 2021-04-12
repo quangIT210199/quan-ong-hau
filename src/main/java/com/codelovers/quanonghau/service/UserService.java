@@ -11,9 +11,13 @@ public interface UserService {
 
     User getCurrentlyLoggedInUser(Authentication authentication);
 
-    boolean exitUserByEmail(String email);
+    boolean isEmailUnique(Integer id,String email);
 
     boolean exitUserByUserName(String username);
 
+    boolean exitUserByEmail(String email);
+
     User createdUser(User user);
+
+    User updateUser(User user);
 }

@@ -45,7 +45,7 @@ public class AuthController {
     @PostMapping(value = "/login", produces = "application/json")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
 
-        // Check authen
+        // Validate username and password using spring authenticate
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                     loginRequest.getEmail(),
