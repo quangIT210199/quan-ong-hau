@@ -29,8 +29,6 @@ public class Role implements Serializable {
     public Role() {
     }
 
-
-
     public Integer getId() {
         return id;
     }

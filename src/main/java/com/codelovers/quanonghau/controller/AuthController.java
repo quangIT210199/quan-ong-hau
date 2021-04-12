@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.controller;
 
-import com.codelovers.quanonghau.constants.AuthoritiesConstants;
+import com.codelovers.quanonghau.contrants.AuthoritesContrants;
 import com.codelovers.quanonghau.entity.Role;
 import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.security.CustomUserDetails;
@@ -8,6 +8,7 @@ import com.codelovers.quanonghau.security.jwt.JwtTokenProvider;
 import com.codelovers.quanonghau.security.payload.LoginRequest;
 import com.codelovers.quanonghau.security.payload.LoginResponse;
 import com.codelovers.quanonghau.security.payload.SignupRequest;
+import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,8 +17,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +40,7 @@ public class AuthController {
     private UserService userSer;
 
     @Autowired
-    private PasswordEncoder encoder;
+    private RoleService roleSer;
 
     @PostMapping(value = "/login", produces = "application/json")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
@@ -78,15 +77,15 @@ public class AuthController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        User user = new User(signupRequest.getEmail(), encoder.encode(signupRequest.getPassword()), signupRequest.getFirstName(), signupRequest.getLastName());
-
-        Role role = new Role(AuthoritiesConstants.USER);
+        User user = new User(signupRequest.getEmail(), signupRequest.getPassword(), signupRequest.getFirstName(), signupRequest.getLastName());
 
         Set<Role> roles = new HashSet<>();
-        roles.add(role);
+
+        Role userRole = roleSer.findByName(AuthoritesContrants.USER);
+        roles.add(userRole);
 
         user.setRoles(roles);
-
+        user.setEnabled(true);
         userSer.createdUser(user);
 
         return new ResponseEntity<>(user, HttpStatus.OK);

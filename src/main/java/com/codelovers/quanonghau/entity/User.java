@@ -61,7 +61,7 @@ public class User implements Serializable {
 
     @Transient
     public String getFullName(){
-        return firstName +" " +lastName;
+        return firstName +" "+lastName;
     }
 
     public User() {

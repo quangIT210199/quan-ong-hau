@@ -1,5 +1,7 @@
 package com.codelovers.quanonghau.controller;
 
+import com.codelovers.quanonghau.contrants.AuthoritesContrants;
+import com.codelovers.quanonghau.controller.RequestPojo.ERole;
 import com.codelovers.quanonghau.entity.Role;
 import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.security.payload.SignupRequest;
@@ -28,9 +30,6 @@ public class UserController {
 
     @Autowired
     RoleService roleSer;
-
-    @Autowired
-    PasswordEncoder encoder;
 
     @GetMapping(value = "/user", produces = "application/json")
     public ResponseEntity<?> getUserById(@Param("id") Integer id){
@@ -63,14 +62,29 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        User user = new User(signupRequest.getEmail(), encoder.encode(signupRequest.getPassword()), signupRequest.getFirstName(), signupRequest.getLastName());
+        User user = new User(signupRequest.getEmail(), signupRequest.getPassword(), signupRequest.getFirstName(), signupRequest.getLastName());
 
         Set<String> listRole = signupRequest.getRole();
 
         Set<Role> roles = new HashSet<>();
 
-        for ( String name: listRole) {
-            roles.add(new Role(name));
+        if(listRole == null){
+            Role userRole = roleSer.findByName(AuthoritesContrants.USER);
+            roles.add(userRole);
+        }
+        else {
+            listRole.forEach( role -> {
+                switch (role){
+                    case "ADMIN":
+                        Role roleAdmin = roleSer.findByName(AuthoritesContrants.ADMIN);
+                        roles.add(roleAdmin);
+                        break;
+                    default:
+                        Role userRole = roleSer.findByName(AuthoritesContrants.USER);
+                        roles.add(userRole);
+                        break;
+                }
+            });
         }
 
         user.setRoles(roles);
