@@ -22,8 +22,11 @@ public class User implements Serializable {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "user_name",length = 64,nullable = false)
-    private String username;
+    @Column(name = "first_name",length = 45,nullable = false)
+    private String firstName;
+
+    @Column(name = "last_name", length = 45, nullable = false)
+    private String lastName;
 
     @Column(name = "email",length = 128, nullable = false, unique = true)
     private String email;
@@ -31,11 +34,14 @@ public class User implements Serializable {
     @Column(name = "password",length = 64, nullable = false)
     private String password;
 
-    @Column(name = "photo", length = 64)
-    private String photo;
+    @Column(name = "photos", length = 64)
+    private String photos;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", length = 11)
     private int phoneNumber;
+
+    @Column(name = "address", length = 64)
+    private String address;
 
     @Column(name = "enabled")
     private boolean enabled;
@@ -53,15 +59,20 @@ public class User implements Serializable {
     )
     private Set<Role> roles = new HashSet<>();
 
+    @Transient
+    public String getFullName(){
+        return firstName +" " +lastName;
+    }
+
     public User() {
     }
 
-    public User(String email, String password, String userName) {
+    public User(String email, String password, String firstName,String lastName) {
         this.email = email;
         this.password = password;
-        this.username = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
-
 
     public Integer getId() {
         return id;
@@ -71,12 +82,20 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -95,12 +114,12 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public String getPhoto() {
-        return photo;
+    public String getPhotos() {
+        return photos;
     }
 
-    public void setPhoto(String photo) {
-        this.photo = photo;
+    public void setPhotos(String photos) {
+        this.photos = photos;
     }
 
     public int getPhoneNumber() {
@@ -109,6 +128,14 @@ public class User implements Serializable {
 
     public void setPhoneNumber(int phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public boolean isEnabled() {

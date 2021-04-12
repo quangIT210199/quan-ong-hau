@@ -3,17 +3,26 @@ package com.codelovers.quanonghau.security.payload;
 import java.util.Set;
 
 public class SignupRequest {
-    private String username;
+    private String firstName;
+    private String lastName;
     private String email;
     private String password;
     private Set<String> role;
 
-    public String getUsername() {
-        return username;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {

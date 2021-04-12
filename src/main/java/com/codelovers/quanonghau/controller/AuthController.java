@@ -72,25 +72,25 @@ public class AuthController {
     //For User
     @PostMapping(value ="/signup", produces = "application/json")
     public ResponseEntity<?> registerUser(@Validated @RequestBody SignupRequest signupRequest){
-        if(userSer.exitUserByUserName(signupRequest.getUsername())){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+//        if(userSer.exitUserByUserName(signupRequest.getUsername())){
+//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//        }
+//
+//        if(userSer.exitUserByEmail(signupRequest.getEmail())){
+//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//        }
+//
+//        User user = new User(signupRequest.getEmail(), encoder.encode(signupRequest.getPassword()), signupRequest.getUsername());
+//
+//        Role role = new Role(AuthoritiesConstants.USER);
+//
+//        Set<Role> roles = new HashSet<>();
+//        roles.add(role);
+//
+//        user.setRoles(roles);
+//
+//        userSer.createdUser(user);
 
-        if(userSer.exitUserByEmail(signupRequest.getEmail())){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-
-        User user = new User(signupRequest.getEmail(), encoder.encode(signupRequest.getPassword()), signupRequest.getUsername());
-
-        Role role = new Role(AuthoritiesConstants.USER);
-
-        Set<Role> roles = new HashSet<>();
-        roles.add(role);
-
-        user.setRoles(roles);
-
-        userSer.createdUser(user);
-
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>( HttpStatus.OK);
     }
 }

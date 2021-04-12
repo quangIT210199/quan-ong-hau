@@ -28,11 +28,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userRepo.getUserByEmail(email);
-    }
-
-    @Override
     public User getCurrentlyLoggedInUser(Authentication authentication){
         if(authentication == null)
             return null;
@@ -65,11 +60,6 @@ public class UserServiceImpl implements UserService {
         }
 
         return true;
-    }
-
-    @Override
-    public boolean exitUserByUserName(String username) {
-        return userRepo.existsByUsername(username);
     }
 
     @Override

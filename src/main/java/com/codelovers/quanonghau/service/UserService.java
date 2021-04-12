@@ -7,13 +7,9 @@ public interface UserService {
 
     User findById(Integer id);
 
-    User findByEmail(String email);
-
     User getCurrentlyLoggedInUser(Authentication authentication);
 
     boolean isEmailUnique(Integer id,String email);
-
-    boolean exitUserByUserName(String username);
 
     boolean exitUserByEmail(String email);
 

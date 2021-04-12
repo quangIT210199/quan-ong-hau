@@ -18,12 +18,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     UserRepository userRepo;
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String email) {
         // Check field of User not null
-        User user = userRepo.getUserByEmail(username);
+        User user = userRepo.getUserByEmail(email);
 
         if (user == null) {
-            throw new UsernameNotFoundException(username);
+            throw new UsernameNotFoundException(email);
         }
 
         return new CustomUserDetails(user);
