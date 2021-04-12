@@ -54,33 +54,30 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping(value = "/user/create", produces = "application/json")
     public ResponseEntity<?> createUser(@Validated @RequestBody SignupRequest signupRequest){
-//        if(userSer.exitUserByUserName(signupRequest.getUsername())){
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
-//
-//        if(userSer.exitUserByEmail(signupRequest.getEmail())){
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
-//
-//        User user = new User(signupRequest.getEmail(), encoder.encode(signupRequest.getPassword()), signupRequest.getUsername());
-//
-//        Set<String> listRole = signupRequest.getRole();
-//
-//        Set<Role> roles = new HashSet<>();
-//
-//        for ( String name: listRole) {
-//            roles.add(new Role(name));
-//        }
-//
-//        user.setRoles(roles);
-//        user.setEnabled(true);
-//
-//        userSer.createdUser(user);
 
-        return new ResponseEntity<>( HttpStatus.OK);
+        if(userSer.exitUserByEmail(signupRequest.getEmail())){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        User user = new User(signupRequest.getEmail(), encoder.encode(signupRequest.getPassword()), signupRequest.getFirstName(), signupRequest.getLastName());
+
+        Set<String> listRole = signupRequest.getRole();
+
+        Set<Role> roles = new HashSet<>();
+
+        for ( String name: listRole) {
+            roles.add(new Role(name));
+        }
+
+        user.setRoles(roles);
+        user.setEnabled(true);
+
+        userSer.createdUser(user);
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     // Need DTO
