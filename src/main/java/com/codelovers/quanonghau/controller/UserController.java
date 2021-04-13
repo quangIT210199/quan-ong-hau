@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// Need Code UploadFile with REST API -.-
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -176,7 +177,7 @@ public class UserController {
 
             String uploadDir = "user-photos/" + userSave.getId();
 
-            FileUploadUtil.cleanDir(uploadDir);
+            FileUploadUtil.cleanDir(uploadDir); // clear all image old
             FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
         } else {
             if (user.getPhotos().isEmpty()) {

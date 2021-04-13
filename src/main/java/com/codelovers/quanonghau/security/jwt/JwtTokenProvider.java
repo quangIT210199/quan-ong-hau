@@ -11,7 +11,7 @@ import java.util.Date;
 @Slf4j
 public class JwtTokenProvider {
 
-    private final String JWT_SECRET = "bezKoderSecretKey";
+    private final String JWT_SECRET = "quangSecurity";
 
     private final Long JWT_EXPIRATION = 604800000L;
 
