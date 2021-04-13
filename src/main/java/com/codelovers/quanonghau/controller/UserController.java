@@ -33,7 +33,7 @@ public class UserController {
 
     @Autowired
     RoleService roleSer;
-    
+
     @GetMapping(value = "/user/firstPage", produces = "application/json")
     public ResponseEntity<?> listFirstPage(){
         return listUser(1, "firstName", "asc", null);
@@ -45,8 +45,8 @@ public class UserController {
         Page<User> page = userSer.listByPage(pageNum, sortField,sortDir, keyword);
 
         List<User> listUser = page.getContent();
-        long startCount = (pageNum - 1) * Contrants.USERS_PER_PAGE + 1;
-        long endCount = startCount + Contrants.USERS_PER_PAGE - 1;
+        long startCount = (pageNum - 1) * Contrants.USERS_PER_PAGE + 1;// Start in index element
+        long endCount = startCount + Contrants.USERS_PER_PAGE - 1; // End element
 
         if(endCount > page.getTotalElements()){
             endCount = page.getTotalElements();

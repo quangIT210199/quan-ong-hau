@@ -34,6 +34,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByEmail(String email) {
+        return userRepo.getUserByEmail(email);
+    }
+
+    @Override
     public User getCurrentlyLoggedInUser(Authentication authentication){
         if(authentication == null)
             return null;

@@ -6,10 +6,7 @@ import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "user")
@@ -60,7 +57,7 @@ public class User implements Serializable {
     private Set<Role> roles = new HashSet<>();
 
     @Transient
-    public String getFullName(){
+    public String getFullName() {
         return firstName +" "+lastName;
     }
 
@@ -69,6 +66,19 @@ public class User implements Serializable {
         if (id == null || photos == null) return "/images/default-user.png";
 
         return "/user-photos/" + this.id + "/" + this.photos;
+    }
+
+    public boolean hasRole(String roleName) {
+        Iterator<Role> iterator = roles.iterator();
+
+        while (iterator.hasNext()) {
+            Role role = iterator.next();
+            if(role.getName().equals(roleName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public User() {

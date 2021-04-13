@@ -9,6 +9,8 @@ public interface UserService {
 
     User findById(Integer id);
 
+    User getUserByEmail(String email);
+
     User getCurrentlyLoggedInUser(Authentication authentication);
 
     boolean isEmailUnique(Integer id,String email);

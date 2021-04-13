@@ -73,4 +73,20 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() { // Check user active?
         return user.isEnabled();
     }
+
+    public String getFullName() {
+        return this.user.getFirstName() +" "+ this.user.getLastName();
+    }
+
+    public void setFirstName(String firstName) {
+        this.user.setFirstName(firstName);
+    }
+
+    public void setLastName(String lastName) {
+        this.user.setLastName(lastName);
+    }
+
+    public boolean hasRole(String roleName) {
+        return user.hasRole(roleName);
+    }
 }
