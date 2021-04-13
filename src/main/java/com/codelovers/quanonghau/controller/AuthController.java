@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.controller;
 
-import com.codelovers.quanonghau.contrants.AuthoritesContrants;
+import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.entity.Role;
 import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.security.CustomUserDetails;
@@ -81,7 +81,7 @@ public class AuthController {
 
         Set<Role> roles = new HashSet<>();
 
-        Role userRole = roleSer.findByName(AuthoritesContrants.USER);
+        Role userRole = roleSer.findByName(Contrants.USER);
         roles.add(userRole);
 
         user.setRoles(roles);

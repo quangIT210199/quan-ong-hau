@@ -1,6 +1,8 @@
 package com.codelovers.quanonghau.service;
 
 import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.exception.UserNotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 
 public interface UserService {
@@ -15,5 +17,9 @@ public interface UserService {
 
     User createdUser(User user);
 
-    User updateUser(User user);
+    void updateUserEnabledStatus(Integer id, boolean enabled);
+
+    void deleteUser(Integer id) throws UserNotFoundException;
+
+    Page<User> listByPage(int pageNum, String sortField, String sortDir, String keyword);
 }

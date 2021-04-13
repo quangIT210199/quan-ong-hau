@@ -64,6 +64,13 @@ public class User implements Serializable {
         return firstName +" "+lastName;
     }
 
+    @Transient
+    public String getPhotosImagePath() {
+        if (id == null || photos == null) return "/images/default-user.png";
+
+        return "/user-photos/" + this.id + "/" + this.photos;
+    }
+
     public User() {
     }
 

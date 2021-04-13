@@ -1,18 +1,25 @@
 package com.codelovers.quanonghau.controller;
 
-import com.codelovers.quanonghau.contrants.AuthoritesContrants;
+import com.codelovers.quanonghau.contrants.Contrants;
+import com.codelovers.quanonghau.controller.output.PagingUser;
 import com.codelovers.quanonghau.entity.Role;
 import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.security.payload.SignupRequest;
 import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
+import com.codelovers.quanonghau.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +33,42 @@ public class UserController {
 
     @Autowired
     RoleService roleSer;
+    
+    @GetMapping(value = "/user/firstPage", produces = "application/json")
+    public ResponseEntity<?> listFirstPage(){
+        return listUser(1, "firstName", "asc", null);
+    }
+
+    @GetMapping(value = "/user/page", produces = "application/json")
+    public ResponseEntity<?> listUser(@RequestParam(value = "pageNum") Integer pageNum, @RequestParam(value = "sortField") String sortField,
+                                      @RequestParam(value = "sortDir") String sortDir, @RequestParam("keyword") String keyword){
+        Page<User> page = userSer.listByPage(pageNum, sortField,sortDir, keyword);
+
+        List<User> listUser = page.getContent();
+        long startCount = (pageNum - 1) * Contrants.USERS_PER_PAGE + 1;
+        long endCount = startCount + Contrants.USERS_PER_PAGE - 1;
+
+        if(endCount > page.getTotalElements()){
+            endCount = page.getTotalElements();
+        }
+
+        String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc";
+
+        PagingUser pagingUser = new PagingUser();
+
+        pagingUser.setUserList(listUser);
+        pagingUser.setCurrentPage(pageNum);
+        pagingUser.setTotalPage(page.getTotalPages());
+        pagingUser.setStartCount(startCount);
+        pagingUser.setEndCount(endCount);
+        pagingUser.setTotalItems(page.getTotalElements());
+        pagingUser.setSortField(sortField);
+        pagingUser.setSortDir(sortDir);
+        pagingUser.setKeyword(keyword);
+        pagingUser.setReverseSortDir(reverseSortDir);
+
+        return new ResponseEntity<>(pagingUser, HttpStatus.OK);
+    }
 
     @GetMapping(value = "/user", produces = "application/json")
     public ResponseEntity<?> getUserById(@Param("id") Integer id){
@@ -40,17 +83,24 @@ public class UserController {
     }
 
     // Get information for form Create User
-    @GetMapping(value = "/users/new", produces = "application/json")
+    @GetMapping(value = "/user/new", produces = "application/json")
     public ResponseEntity<?> newUser(){
         List<Role> listRole = roleSer.listRole();
 
         User user  = new User();
         user.setEnabled(true);
-        user.setRoles((Set<Role>) listRole);
+
+        Set<Role> roles = new HashSet<>();
+
+        for (Role role : listRole ) {
+            roles.add(role);
+        }
+
+        user.setRoles(roles);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-
+    // Tạo USER mới để test
     @PostMapping(value = "/user/create", produces = "application/json")
     public ResponseEntity<?> createUser(@Validated @RequestBody SignupRequest signupRequest){
 
@@ -65,18 +115,18 @@ public class UserController {
         Set<Role> roles = new HashSet<>();
 
         if(listRole == null){
-            Role userRole = roleSer.findByName(AuthoritesContrants.USER);
+            Role userRole = roleSer.findByName(Contrants.USER);
             roles.add(userRole);
         }
         else {
             listRole.forEach( role -> {
                 switch (role){
                     case "ADMIN":
-                        Role roleAdmin = roleSer.findByName(AuthoritesContrants.ADMIN);
+                        Role roleAdmin = roleSer.findByName(Contrants.ADMIN);
                         roles.add(roleAdmin);
                         break;
                     default:
-                        Role userRole = roleSer.findByName(AuthoritesContrants.USER);
+                        Role userRole = roleSer.findByName(Contrants.USER);
                         roles.add(userRole);
                         break;
                 }
@@ -91,33 +141,54 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    // Need DTO
-    @PutMapping(value = "/user/save/{id}", produces = "application/json")
-    public ResponseEntity<?> saveUser(@PathVariable("id") Integer id ,@RequestBody User user){
-        // Mỗi lần call cx phải check email
-//        if(userSer.isEmailUnique(id, user.getEmail())){
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
+    //can use @RequestParam("image"), this API create User By ADMIN or update USER
+    @PostMapping(value = "/user/save", produces = "application/json")
+    public ResponseEntity<?> saveUser(User user, MultipartFile multipartFile,String listRoles) throws IOException {
 
-        User u = userSer.findById(id);
-        System.out.println(u.toString());
-        if(u == null){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        Set<Role> roles = new HashSet<>();
+
+        if(listRoles.isEmpty()){
+            Role userRole = roleSer.findByName(Contrants.USER);
+            roles.add(userRole);
+        }
+        else {
+            String[] arr = listRoles.trim().split(",");
+            for (String role : arr){
+                if ("ADMIN".equals(role)) {
+                    Role roleAdmin = roleSer.findByName(Contrants.ADMIN);
+                    roles.add(roleAdmin);
+                } else {
+                    Role userRole = roleSer.findByName(Contrants.USER);
+                    roles.add(userRole);
+                }
+            }
         }
 
-        u.setFirstName(user.getFirstName());
-        u.setLastName(user.getLastName());
-        u.setEnabled(user.isEnabled());
-        u.setAddress(user.getAddress());
-        u.setEmail(user.getEmail());
-        u.setPassword(user.getPassword());
+        user.setRoles(roles);
 
-        userSer.createdUser(user);
+        if(!multipartFile.isEmpty()){
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+            System.out.println("Name of file: " + fileName);
+            user.setPhotos(fileName);
+
+            User userSave = userSer.createdUser(user);
+
+            String uploadDir = "user-photos/" + userSave.getId();
+
+            FileUploadUtil.cleanDir(uploadDir);
+            FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+        } else {
+            if (user.getPhotos().isEmpty()) {
+                user.setPhotos(null);
+            }
+            userSer.createdUser(user);
+        }
+
+        return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
-    // Get user information for edit form, need DTO
+    // Get user information for edit form for USER , need code DTO
     @GetMapping(value = "/user/edit/{id}", produces = "application/json")
     public ResponseEntity<?> editUser(@PathVariable(name = "id") Integer id){
         User user = userSer.findById(id);
@@ -126,7 +197,43 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
+        List<Role> listRole = roleSer.listRole();
+
+        Set<Role> roles = new HashSet<>();
+
+        for (Role role : listRole ) {
+            roles.add(role);
+        }
+
+        user.setRoles(roles);
+
         return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/user/delete/{id}", produces = "application/json")
+    public ResponseEntity<?> removeUser(@PathVariable("id") Integer id) {
+
+        try {
+            userSer.deleteUser(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (UserNotFoundException ex){
+            System.out.println(ex.getMessage());
+            return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping(value = "/user/{id}/enabled/{status}", produces = "application/json")
+    public ResponseEntity<?> updateUserEnabledStatus(@PathVariable("id") Integer id,
+                                                     @PathVariable("status") boolean enabled){
+        User user = userSer.findById(id);
+        if(user == null){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        userSer.updateUserEnabledStatus(id, enabled);
+
+        String status = enabled ? "enabled" : "disabled";
+
+        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
     @PostMapping(value = "/user/check_email", produces = "application/json")
