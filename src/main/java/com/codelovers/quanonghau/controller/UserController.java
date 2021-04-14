@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-// Need Code UploadFile with REST API -.-
+// Need Code return Image with REST API -.-
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -75,7 +75,7 @@ public class UserController {
     public ResponseEntity<?> getUserById(@Param("id") Integer id){
 
         User user = userSer.findById(id);
-
+        System.out.println("Path: " + user.getPhotosImagePath());
         if(user == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
