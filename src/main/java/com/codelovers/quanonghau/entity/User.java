@@ -3,6 +3,7 @@ package com.codelovers.quanonghau.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -57,20 +58,15 @@ public class User implements Serializable {
     private Set<Role> roles = new HashSet<>();
 
     @Transient
-    public byte[] getByteImage(byte[] picByte) {
-        return picByte;
-    }
-
-    @Transient
     public String getFullName() {
         return firstName +" "+lastName;
     }
 
     @Transient
     public String getPhotosImagePath() {
-        if (id == null || photos == null) return "/images/default-user.png";
+        if (id == null || photos == null) return "/user-photo/default-user.png";
 
-        return "/user-photos/" + this.id + "/" + this.photos;
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("user-photo/" + this.id + "/" + this.photos).toUriString();
     }
 
     public boolean hasRole(String roleName) {

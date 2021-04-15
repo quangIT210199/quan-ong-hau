@@ -2,9 +2,7 @@ package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.entity.User;
-import com.codelovers.quanonghau.entity.UserImage;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
-import com.codelovers.quanonghau.repository.UserImageRepository;
 import com.codelovers.quanonghau.repository.UserRepository;
 import com.codelovers.quanonghau.security.CustomUserDetails;
 import com.codelovers.quanonghau.service.UserService;
@@ -19,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 @Service
 @Transactional

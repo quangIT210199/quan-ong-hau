@@ -1,7 +1,6 @@
 package com.codelovers.quanonghau.service;
 
 import com.codelovers.quanonghau.entity.User;
-import com.codelovers.quanonghau.entity.UserImage;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;

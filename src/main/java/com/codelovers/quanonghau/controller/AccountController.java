@@ -2,16 +2,14 @@ package com.codelovers.quanonghau.controller;
 
 import com.codelovers.quanonghau.controller.output.UpdatePassword;
 import com.codelovers.quanonghau.entity.User;
-import com.codelovers.quanonghau.entity.UserImage;
 import com.codelovers.quanonghau.security.CustomUserDetails;
-import com.codelovers.quanonghau.service.UserImageService;
 import com.codelovers.quanonghau.service.UserService;
-import com.codelovers.quanonghau.util.HandlingByte;
+import com.codelovers.quanonghau.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,9 +22,6 @@ public class AccountController {
 
     @Autowired
     private UserService userSer;
-
-    @Autowired
-    private UserImageService userImageSer;
 
     @GetMapping(value = "/account", produces = "application/json")
     public ResponseEntity<?> viewDetail(@AuthenticationPrincipal CustomUserDetails loggerUser) {
@@ -42,37 +37,29 @@ public class AccountController {
     }
 
     @PostMapping(value = "/account/updateInfo", produces = "application/json")
-    public ResponseEntity<?> saveDetail(User user, @AuthenticationPrincipal CustomUserDetails loggerUser,
-                                        @RequestParam(name = "imageFile") MultipartFile file) throws IOException {
-        // Only update info, get id
-        User uTemp = loggerUser.getUser();
-        // Cập nhật thông tin cá nhân cho user hiện tại
-        uTemp.setLastName(user.getLastName());
-        uTemp.setFirstName(user.getFirstName());
-        uTemp.setAddress(user.getAddress());
-        uTemp.setPhoneNumber(user.getPhoneNumber());
+    public ResponseEntity<?> saveDetail(User user, @RequestParam(name = "imageFile") MultipartFile file,
+                                        @AuthenticationPrincipal CustomUserDetails loggerUser) throws IOException {
 
-        if(!file.isEmpty()){
-            UserImage img = new UserImage(file.getOriginalFilename(), file.getContentType(),
-                    file.getBytes().length, HandlingByte.compressBytes(file.getBytes()));
+        if(!file.isEmpty()) {
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
-            UserImage imageOld = userImageSer.findByUserId(uTemp.getId());
-            if(imageOld != null) {
+            user.setPhotos(fileName);
+            User savedUser = userSer.createdUser(user);
 
-                System.out.println("ID của ảnh cũ: " + imageOld.getId());
+            String uploadDir = "src/main/resources/static/user-photo/" + savedUser.getId();
 
-                //get ImageOld and delete
-                userImageSer.deleteUserImage(imageOld);
-            }
+            FileUploadUtil.cleanDir(uploadDir);
+            FileUploadUtil.saveFile(uploadDir, fileName, file);
+        } else {
+            if (user.getPhotos().isEmpty()) user.setPhotos(null);
 
-            // SAVE imageNew
-            img.setUser(uTemp);
-            userImageSer.saveUserImage(img);
+            userSer.createdUser(user);
         }
 
-        userSer.createdUser(uTemp);
+        loggerUser.setFirstName(user.getFirstName());
+        loggerUser.setLastName(user.getLastName());
 
-        return new ResponseEntity<>(uTemp, HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping(value = "/account/updatePass", produces = "application/json")
@@ -81,8 +68,6 @@ public class AccountController {
         if(!password.getConfirmPass().equals(password.getNewPassword())){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        System.out.println("TK đang logger: " + loggerUser.getUser().getEmail());
-        System.out.println("Ten ng dang login: " + SecurityContextHolder.getContext().getAuthentication().getName());
 
         if(userSer.checkIfValidOldPassword(loggerUser.getUser(), password.getOldPassword())){
 

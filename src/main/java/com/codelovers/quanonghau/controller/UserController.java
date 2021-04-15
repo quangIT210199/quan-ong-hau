@@ -4,14 +4,11 @@ import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.controller.output.PagingUser;
 import com.codelovers.quanonghau.entity.Role;
 import com.codelovers.quanonghau.entity.User;
-import com.codelovers.quanonghau.entity.UserImage;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.security.payload.SignupRequest;
 import com.codelovers.quanonghau.service.RoleService;
-import com.codelovers.quanonghau.service.UserImageService;
 import com.codelovers.quanonghau.service.UserService;
 import com.codelovers.quanonghau.util.FileUploadUtil;
-import com.codelovers.quanonghau.util.HandlingByte;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
@@ -36,9 +33,6 @@ public class UserController {
     UserService userSer;
 
     @Autowired
-    UserImageService userImageSer;
-
-    @Autowired
     RoleService roleSer;
 
     @GetMapping(value = "/user/firstPage", produces = "application/json")
@@ -46,21 +40,6 @@ public class UserController {
         return listUser(1, "firstName", "asc", null);
     }
 
-    @GetMapping(value = "/user/getImage")
-    public ResponseEntity<?> getImageUser(@RequestParam Integer id){
-        User user = userSer.findById(id);
-
-        if(user == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-
-        UserImage userImage = userImageSer.findByUserId(user.getId());
-        if(userImage == null){
-            return new ResponseEntity<>(null,HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(userImage,HttpStatus.OK);
-    }
 
     @GetMapping(value = "/user/page", produces = "application/json")
     public ResponseEntity<?> listUser(@RequestParam(value = "pageNum") Integer pageNum, @RequestParam(value = "sortField") String sortField,
@@ -73,11 +52,6 @@ public class UserController {
 
         if(endCount > page.getTotalElements()){
             endCount = page.getTotalElements();
-        }
-
-        for (User u : listUser) {
-            UserImage userImage = userImageSer.findByUserId(u.getId());
-            u.getByteImage(userImage.getPicByte());
         }
 
         String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc";
@@ -203,41 +177,19 @@ public class UserController {
 
         user.setRoles(roles);
 
-        if(!file.isEmpty() && user.getId() != null) { // Can thay image moi. xoa Image cu di
-            System.out.println("Original Image Byte Size - " + file.getBytes().length);
-            UserImage imageNew = new UserImage(file.getOriginalFilename(), file.getContentType(),file.getBytes().length,
-                    HandlingByte.compressBytes(file.getBytes()));
+        if (!file.isEmpty()) {
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
-            UserImage imageOld = userImageSer.findByUserId(user.getId());
-            if(imageOld != null) {
+            user.setPhotos(fileName);
+            User savedUser = userSer.createdUser(user);
 
-                System.out.println("ID của ảnh cũ: " + imageOld.getId());
+            String uploadDir = "src/main/resources/static/user-photo/" + savedUser.getId();
 
-                //get ImageOld and delete
-                userImageSer.deleteUserImage(imageOld);
-            }
+            FileUploadUtil.cleanDir(uploadDir);
+            FileUploadUtil.saveFile(uploadDir, fileName, file);
 
-            // SAVE imageNew
-            imageNew.setUser(user);
-            userImageSer.saveUserImage(imageNew);
-        }
-        else if(!file.isEmpty() && user.getId() == null) {
-            System.out.println("Creater New User");
-            User uTemp = userSer.createdUser(user);
-
-            System.out.println("Original Image Byte Size - " + file.getBytes().length);
-            UserImage imageNew = new UserImage(file.getOriginalFilename(), file.getContentType(),file.getBytes().length,
-                    HandlingByte.compressBytes(file.getBytes()));
-
-            imageNew.setUser(user);
-            userImageSer.saveUserImage(imageNew);
-        }
-        else if(file.isEmpty() && user.getId() != null) {
-            User u = userSer.findById(user.getId());
-            //Chi cập nhật tt User
-            userSer.createdUser(user);
-        }
-        else {
+        } else {
+            if (user.getPhotos().isEmpty()) user.setPhotos(null);
             userSer.createdUser(user);
         }
 
