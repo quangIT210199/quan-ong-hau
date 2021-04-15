@@ -1,23 +1,21 @@
 package com.codelovers.quanonghau.controller;
 
-import com.codelovers.quanonghau.contrants.Contrants;
-import com.codelovers.quanonghau.entity.Role;
+import com.codelovers.quanonghau.controller.output.UpdatePassword;
 import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.entity.UserImage;
 import com.codelovers.quanonghau.security.CustomUserDetails;
 import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
-import com.codelovers.quanonghau.util.FileUploadUtil;
+import com.codelovers.quanonghau.util.HandlingByte;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.StringUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 // This Controller get detail user for update, need code DTO for API change Password
 @RestController
@@ -26,9 +24,6 @@ public class AccountController {
 
     @Autowired
     private UserService userSer;
-
-    @Autowired
-    private RoleService roleSer;
 
     @GetMapping(value = "/account", produces = "application/json")
     public ResponseEntity<?> viewDetail(@AuthenticationPrincipal CustomUserDetails loggerUser) {
@@ -43,52 +38,54 @@ public class AccountController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/account/update", produces = "application/json")
-    public ResponseEntity<?> saveDetail(@RequestBody User user, @AuthenticationPrincipal CustomUserDetails loggerUser,
-                                        MultipartFile multipartFile, String listRoles) throws IOException {
-        Set<Role> roles = new HashSet<>();
+    @PostMapping(value = "/account/updateInfo", produces = "application/json")
+    public ResponseEntity<?> saveDetail(User user, @AuthenticationPrincipal CustomUserDetails loggerUser,
+                                        @RequestParam(name = "imageFile") MultipartFile file) throws IOException {
+        // Only update, get id
+        User uTemp = loggerUser.getUser();
+        // Cập nhật thông tin cá nhân cho user hiện tại
+        uTemp.setLastName(user.getLastName());
+        uTemp.setFirstName(user.getFirstName());
+        uTemp.setAddress(user.getAddress());
+        uTemp.setPhoneNumber(user.getPhoneNumber());
 
-        if(listRoles.isEmpty()){
-            Role userRole = roleSer.findByName(Contrants.USER);
-            roles.add(userRole);
-        }
-        else {
-            String[] arr = listRoles.trim().split(",");
-            for (String role : arr){
-                if ("ADMIN".equals(role)) {
-                    Role roleAdmin = roleSer.findByName(Contrants.ADMIN);
-                    roles.add(roleAdmin);
-                } else {
-                    Role userRole = roleSer.findByName(Contrants.USER);
-                    roles.add(userRole);
-                }
+        if(!file.isEmpty()){
+            UserImage img = new UserImage(file.getOriginalFilename(), file.getContentType(),
+                    file.getBytes().length, HandlingByte.compressBytes(file.getBytes()));
+
+            UserImage imageOld = userSer.findByUserId(uTemp.getId());
+            if(imageOld != null) {
+
+                System.out.println("ID của ảnh cũ: " + imageOld.getId());
+
+                //get ImageOld and delete
+                userSer.deleteUserImage(imageOld);
             }
+
+            // SAVE imageNew
+            img.setUser(uTemp);
+            userSer.saveUserImage(img);
         }
 
-        user.setRoles(roles);
+        userSer.createdUser(uTemp);
 
-        if(!multipartFile.isEmpty()) {
-            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        return new ResponseEntity<>(uTemp, HttpStatus.OK);
+    }
 
-            System.out.println("Name of file: " + fileName);
-            user.setPhotos(fileName);
+    @PostMapping(value = "/account/updatePass", produces = "application/json")
+    public ResponseEntity<?> updatePassword(@RequestBody UpdatePassword password,
+                                            @AuthenticationPrincipal CustomUserDetails loggerUser){
+        if(!password.getConfirmPass().equals(password.getNewPassword())){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        System.out.println("TK đang logger: " + loggerUser.getUser().getEmail());
+        System.out.println("Ten ng dang login: " + SecurityContextHolder.getContext().getAuthentication().getName());
 
-            User userSave = userSer.createdUser(user);
-
-            String uploadDir = "user-photos/" + userSave.getId();
-
-            FileUploadUtil.cleanDir(uploadDir);
-            FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-        } else {
-            if (user.getPhotos().isEmpty()) {
-                user.setPhotos(null);
-            }
-            userSer.createdUser(user);
+        if(userSer.checkIfValidOldPassword(loggerUser.getUser(), password.getOldPassword())){
+            System.out.println("Thay đổi mật khẩu");
+            userSer.changePassword(loggerUser.getUser(), password.getNewPassword());
         }
 
-        loggerUser.setFirstName(user.getFirstName());
-        loggerUser.setLastName(user.getLastName());
-
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -2,7 +2,9 @@ package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.entity.UserImage;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
+import com.codelovers.quanonghau.repository.UserImageRepository;
 import com.codelovers.quanonghau.repository.UserRepository;
 import com.codelovers.quanonghau.security.CustomUserDetails;
 import com.codelovers.quanonghau.service.UserService;
@@ -12,10 +14,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -23,6 +27,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepo;
+
+    @Autowired
+    UserImageRepository userImageRepo;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -66,7 +73,47 @@ public class UserServiceImpl implements UserService {
         }
         return userRepo.findAll(pageable);
     }
+    ///////
+    @Override
+    public void deleteUserImage(UserImage userImage) {
+        userImageRepo.delete(userImage);
+    }
 
+    @Override
+    public UserImage saveUserImage(UserImage userImage) {
+        return userImageRepo.save(userImage);
+    }
+
+    @Override
+    public UserImage findByUserId(Integer userId) {
+
+        return userImageRepo.findByUserId(userId);
+    }
+
+    @Override
+    public boolean checkIfValidOldPassword(User user, String oldPassword) {
+
+        passwordEncoder = new BCryptPasswordEncoder();
+
+        System.out.println(oldPassword);
+        String encodeOldPass = passwordEncoder.encode(oldPassword);
+        System.out.println(user.getPassword());
+        System.out.println(encodeOldPass);
+        if(user.getPassword().equals(encodeOldPass)){
+            System.out.println("Mật khẩu cũ đúng");
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public User changePassword(User user, String newPassword) {
+
+        return userRepo.updatePassword(user.getId(), passwordEncoder.encode(newPassword));
+    }
+
+    ///////
     @Override
     public boolean isEmailUnique(Integer id, String email) { // Use for update User
         User userByEmail = userRepo.getUserByEmail(email);

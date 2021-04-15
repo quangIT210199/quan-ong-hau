@@ -4,11 +4,13 @@ import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.controller.output.PagingUser;
 import com.codelovers.quanonghau.entity.Role;
 import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.entity.UserImage;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.security.payload.SignupRequest;
 import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
 import com.codelovers.quanonghau.util.FileUploadUtil;
+import com.codelovers.quanonghau.util.HandlingByte;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
@@ -143,8 +145,9 @@ public class UserController {
     }
 
     //can use @RequestParam("image"), this API create User By ADMIN or update USER
-    @PostMapping(value = "/user/save", produces = "application/json")
-    public ResponseEntity<?> saveUser(User user, MultipartFile multipartFile,String listRoles) throws IOException {
+    // User user is must input form-data
+    @PostMapping(value = "/user/save",consumes = "multipart/form-data", produces = "application/json")
+    public ResponseEntity<?> saveUser(User user, @RequestParam(name = "imageFile") MultipartFile file,String listRoles) throws IOException {
 
         Set<Role> roles = new HashSet<>();
 
@@ -167,26 +170,45 @@ public class UserController {
 
         user.setRoles(roles);
 
-        if(!multipartFile.isEmpty()){
-            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        if(!file.isEmpty() && user.getId() != null) { // Can thay image moi. xoa Image cu di
+            System.out.println("Original Image Byte Size - " + file.getBytes().length);
+            UserImage imageNew = new UserImage(file.getOriginalFilename(), file.getContentType(),file.getBytes().length,
+                    HandlingByte.compressBytes(file.getBytes()));
 
-            System.out.println("Name of file: " + fileName);
-            user.setPhotos(fileName);
+            UserImage imageOld = userSer.findByUserId(user.getId());
+            if(imageOld != null) {
 
-            User userSave = userSer.createdUser(user);
+                System.out.println("ID của ảnh cũ: " + imageOld.getId());
 
-            String uploadDir = "user-photos/" + userSave.getId();
-
-            FileUploadUtil.cleanDir(uploadDir); // clear all image old
-            FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-        } else {
-            if (user.getPhotos().isEmpty()) {
-                user.setPhotos(null);
+                //get ImageOld and delete
+                userSer.deleteUserImage(imageOld);
             }
+
+            // SAVE imageNew
+            imageNew.setUser(user);
+            userSer.saveUserImage(imageNew);
+        }
+        else if(!file.isEmpty() && user.getId() == null) {
+            System.out.println("Creater New User");
+            User uTemp = userSer.createdUser(user);
+
+            System.out.println("Original Image Byte Size - " + file.getBytes().length);
+            UserImage imageNew = new UserImage(file.getOriginalFilename(), file.getContentType(),file.getBytes().length,
+                    HandlingByte.compressBytes(file.getBytes()));
+
+            imageNew.setUser(user);
+            userSer.saveUserImage(imageNew);
+        }
+        else if(file.isEmpty() && user.getId() != null) {
+            User u = userSer.findById(user.getId());
+            //Chi cập nhật tt User
+            userSer.createdUser(user);
+        }
+        else {
             userSer.createdUser(user);
         }
 
-        return new ResponseEntity<>(user,HttpStatus.OK);
+        return new ResponseEntity<>(user ,HttpStatus.OK);
     }
 
     // Get user information for edit form for USER , need code DTO
