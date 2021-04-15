@@ -95,12 +95,7 @@ public class UserServiceImpl implements UserService {
 
         passwordEncoder = new BCryptPasswordEncoder();
 
-        System.out.println(oldPassword);
-        String encodeOldPass = passwordEncoder.encode(oldPassword);
-        System.out.println(user.getPassword());
-        System.out.println(encodeOldPass);
-        if(user.getPassword().equals(encodeOldPass)){
-            System.out.println("Mật khẩu cũ đúng");
+        if(passwordEncoder.matches(oldPassword, user.getPassword())) {
             return true;
         }
 
@@ -108,9 +103,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User changePassword(User user, String newPassword) {
+    public void changePassword(User user, String newPassword) {
 
-        return userRepo.updatePassword(user.getId(), passwordEncoder.encode(newPassword));
+        userRepo.updatePassword(user.getId(), passwordEncoder.encode(newPassword));
     }
 
     ///////

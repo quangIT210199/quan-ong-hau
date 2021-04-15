@@ -34,5 +34,5 @@ public interface UserService {
 
     boolean checkIfValidOldPassword(User user, String oldPassword);
 
-    User changePassword(User user, String newPassword);
+    void changePassword(User user, String newPassword);
 }

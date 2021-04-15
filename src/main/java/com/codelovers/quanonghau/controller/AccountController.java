@@ -82,7 +82,7 @@ public class AccountController {
         System.out.println("Ten ng dang login: " + SecurityContextHolder.getContext().getAuthentication().getName());
 
         if(userSer.checkIfValidOldPassword(loggerUser.getUser(), password.getOldPassword())){
-            System.out.println("Thay đổi mật khẩu");
+
             userSer.changePassword(loggerUser.getUser(), password.getNewPassword());
         }
 

@@ -32,5 +32,5 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 
     @Query("UPDATE User u SET u.password = ?2 WHERE u.id =?1")
     @Modifying
-    User updatePassword(Integer id, String password);
+    int updatePassword(Integer id, String password);
 }
