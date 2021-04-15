@@ -8,6 +8,7 @@ import com.codelovers.quanonghau.entity.UserImage;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.security.payload.SignupRequest;
 import com.codelovers.quanonghau.service.RoleService;
+import com.codelovers.quanonghau.service.UserImageService;
 import com.codelovers.quanonghau.service.UserService;
 import com.codelovers.quanonghau.util.FileUploadUtil;
 import com.codelovers.quanonghau.util.HandlingByte;
@@ -35,11 +36,30 @@ public class UserController {
     UserService userSer;
 
     @Autowired
+    UserImageService userImageSer;
+
+    @Autowired
     RoleService roleSer;
 
     @GetMapping(value = "/user/firstPage", produces = "application/json")
     public ResponseEntity<?> listFirstPage(){
         return listUser(1, "firstName", "asc", null);
+    }
+
+    @GetMapping(value = "/user/getImage")
+    public ResponseEntity<?> getImageUser(@RequestParam Integer id){
+        User user = userSer.findById(id);
+
+        if(user == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        UserImage userImage = userImageSer.findByUserId(user.getId());
+        if(userImage == null){
+            return new ResponseEntity<>(null,HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(userImage,HttpStatus.OK);
     }
 
     @GetMapping(value = "/user/page", produces = "application/json")
@@ -53,6 +73,11 @@ public class UserController {
 
         if(endCount > page.getTotalElements()){
             endCount = page.getTotalElements();
+        }
+
+        for (User u : listUser) {
+            UserImage userImage = userImageSer.findByUserId(u.getId());
+            u.getByteImage(userImage.getPicByte());
         }
 
         String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc";
@@ -156,9 +181,17 @@ public class UserController {
             roles.add(userRole);
         }
         else {
-            String[] arr = listRoles.trim().split(",");
+            // Need check value
+            String[] arr = null;
+            if(listRoles.contains(",")){
+                arr = listRoles.trim().split(",");
+            }
+            else{
+                arr[0] = listRoles.trim();
+            }
+
             for (String role : arr){
-                if ("ADMIN".equals(role)) {
+                if ("ADMIN".equals(role.trim())) {
                     Role roleAdmin = roleSer.findByName(Contrants.ADMIN);
                     roles.add(roleAdmin);
                 } else {
@@ -175,18 +208,18 @@ public class UserController {
             UserImage imageNew = new UserImage(file.getOriginalFilename(), file.getContentType(),file.getBytes().length,
                     HandlingByte.compressBytes(file.getBytes()));
 
-            UserImage imageOld = userSer.findByUserId(user.getId());
+            UserImage imageOld = userImageSer.findByUserId(user.getId());
             if(imageOld != null) {
 
                 System.out.println("ID của ảnh cũ: " + imageOld.getId());
 
                 //get ImageOld and delete
-                userSer.deleteUserImage(imageOld);
+                userImageSer.deleteUserImage(imageOld);
             }
 
             // SAVE imageNew
             imageNew.setUser(user);
-            userSer.saveUserImage(imageNew);
+            userImageSer.saveUserImage(imageNew);
         }
         else if(!file.isEmpty() && user.getId() == null) {
             System.out.println("Creater New User");
@@ -197,7 +230,7 @@ public class UserController {
                     HandlingByte.compressBytes(file.getBytes()));
 
             imageNew.setUser(user);
-            userSer.saveUserImage(imageNew);
+            userImageSer.saveUserImage(imageNew);
         }
         else if(file.isEmpty() && user.getId() != null) {
             User u = userSer.findById(user.getId());
@@ -261,6 +294,7 @@ public class UserController {
 
     @PostMapping(value = "/user/check_email", produces = "application/json")
     public ResponseEntity<?> checkDuplicateEmail(@Param("id") Integer id, @Param("email") String email){
+
         String result =  userSer.isEmailUnique(id, email) ? "OK" : "Duplicated";
 
         return new ResponseEntity<>(result, HttpStatus.OK);

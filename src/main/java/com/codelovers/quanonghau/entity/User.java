@@ -57,6 +57,11 @@ public class User implements Serializable {
     private Set<Role> roles = new HashSet<>();
 
     @Transient
+    public byte[] getByteImage(byte[] picByte) {
+        return picByte;
+    }
+
+    @Transient
     public String getFullName() {
         return firstName +" "+lastName;
     }

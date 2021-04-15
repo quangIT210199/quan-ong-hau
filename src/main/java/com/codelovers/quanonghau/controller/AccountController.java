@@ -4,7 +4,7 @@ import com.codelovers.quanonghau.controller.output.UpdatePassword;
 import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.entity.UserImage;
 import com.codelovers.quanonghau.security.CustomUserDetails;
-import com.codelovers.quanonghau.service.RoleService;
+import com.codelovers.quanonghau.service.UserImageService;
 import com.codelovers.quanonghau.service.UserService;
 import com.codelovers.quanonghau.util.HandlingByte;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,9 @@ public class AccountController {
     @Autowired
     private UserService userSer;
 
+    @Autowired
+    private UserImageService userImageSer;
+
     @GetMapping(value = "/account", produces = "application/json")
     public ResponseEntity<?> viewDetail(@AuthenticationPrincipal CustomUserDetails loggerUser) {
 
@@ -41,7 +44,7 @@ public class AccountController {
     @PostMapping(value = "/account/updateInfo", produces = "application/json")
     public ResponseEntity<?> saveDetail(User user, @AuthenticationPrincipal CustomUserDetails loggerUser,
                                         @RequestParam(name = "imageFile") MultipartFile file) throws IOException {
-        // Only update, get id
+        // Only update info, get id
         User uTemp = loggerUser.getUser();
         // Cập nhật thông tin cá nhân cho user hiện tại
         uTemp.setLastName(user.getLastName());
@@ -53,18 +56,18 @@ public class AccountController {
             UserImage img = new UserImage(file.getOriginalFilename(), file.getContentType(),
                     file.getBytes().length, HandlingByte.compressBytes(file.getBytes()));
 
-            UserImage imageOld = userSer.findByUserId(uTemp.getId());
+            UserImage imageOld = userImageSer.findByUserId(uTemp.getId());
             if(imageOld != null) {
 
                 System.out.println("ID của ảnh cũ: " + imageOld.getId());
 
                 //get ImageOld and delete
-                userSer.deleteUserImage(imageOld);
+                userImageSer.deleteUserImage(imageOld);
             }
 
             // SAVE imageNew
             img.setUser(uTemp);
-            userSer.saveUserImage(img);
+            userImageSer.saveUserImage(img);
         }
 
         userSer.createdUser(uTemp);

@@ -26,12 +26,6 @@ public interface UserService {
 
     Page<User> listByPage(int pageNum, String sortField, String sortDir, String keyword);
 
-    void deleteUserImage(UserImage userImage);
-
-    UserImage saveUserImage(UserImage userImage);
-
-    UserImage findByUserId(Integer userId);
-
     boolean checkIfValidOldPassword(User user, String oldPassword);
 
     void changePassword(User user, String newPassword);

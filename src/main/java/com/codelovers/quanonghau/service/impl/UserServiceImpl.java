@@ -29,9 +29,6 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepo;
 
     @Autowired
-    UserImageRepository userImageRepo;
-
-    @Autowired
     PasswordEncoder passwordEncoder;
 
     @Override
@@ -74,21 +71,6 @@ public class UserServiceImpl implements UserService {
         return userRepo.findAll(pageable);
     }
     ///////
-    @Override
-    public void deleteUserImage(UserImage userImage) {
-        userImageRepo.delete(userImage);
-    }
-
-    @Override
-    public UserImage saveUserImage(UserImage userImage) {
-        return userImageRepo.save(userImage);
-    }
-
-    @Override
-    public UserImage findByUserId(Integer userId) {
-
-        return userImageRepo.findByUserId(userId);
-    }
 
     @Override
     public boolean checkIfValidOldPassword(User user, String oldPassword) {
