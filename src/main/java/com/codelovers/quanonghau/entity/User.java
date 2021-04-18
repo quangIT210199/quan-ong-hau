@@ -47,7 +47,7 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<CartItem> cartItems = new ArrayList<>();
 
-    @JsonIgnore
+//    @JsonIgnore
     @Fetch(FetchMode.JOIN)
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
@@ -64,7 +64,7 @@ public class User implements Serializable {
 
     @Transient
     public String getPhotosImagePath() {
-        if (id == null || photos == null) return "/user-photo/default-user.png";
+        if (id == null || photos == null) return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user-photo/default-user.png").toUriString();
 
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("user-photo/" + this.id + "/" + this.photos).toUriString();
     }

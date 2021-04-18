@@ -28,4 +28,6 @@ public interface UserService {
     boolean checkIfValidOldPassword(User user, String oldPassword);
 
     void changePassword(User user, String newPassword);
+
+    User updateAccount(User userInForm);
 }

@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "product")
@@ -18,23 +20,28 @@ public class Product implements Serializable{
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", length = 256, nullable = false, unique = true)
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 4096, nullable = false)
     private String description;
 
     @Column(name = "in_stock")
     private int inStock;
 
-    @Column(name = "price")
-    private float price;
-
     @Column(name = "created_time")
     private String createdTime;
 
-//    @Column(name = "updated_time")
-//    private String updatedTime;
+    @Column(name = "updated_time")
+    private String updatedTime;
+
+    private boolean enabled;
+
+    @Column(name = "price")
+    private float price;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private Set<ProductImage> productImageSet = new HashSet<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
@@ -67,14 +74,6 @@ public class Product implements Serializable{
         return description;
     }
 
-    public float getPrice() {
-        return price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -93,6 +92,38 @@ public class Product implements Serializable{
 
     public void setCreatedTime(String createdTime) {
         this.createdTime = createdTime;
+    }
+
+    public String getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(String updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    public Set<ProductImage> getProductImageSet() {
+        return productImageSet;
+    }
+
+    public void setProductImageSet(Set<ProductImage> productImageSet) {
+        this.productImageSet = productImageSet;
     }
 
     public List<CartItem> getCartItems() {

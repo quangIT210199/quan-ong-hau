@@ -44,7 +44,7 @@ public class AccountController {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
             user.setPhotos(fileName);
-            User savedUser = userSer.createdUser(user);
+            User savedUser = userSer.updateAccount(user);
 
             String uploadDir = "src/main/resources/static/user-photo/" + savedUser.getId();
 
@@ -53,7 +53,7 @@ public class AccountController {
         } else {
             if (user.getPhotos().isEmpty()) user.setPhotos(null);
 
-            userSer.createdUser(user);
+            userSer.updateAccount(user);
         }
 
         loggerUser.setFirstName(user.getFirstName());

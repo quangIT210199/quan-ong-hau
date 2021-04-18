@@ -67,7 +67,6 @@ public class UserServiceImpl implements UserService {
         }
         return userRepo.findAll(pageable);
     }
-    ///////
 
     @Override
     public boolean checkIfValidOldPassword(User user, String oldPassword) {
@@ -87,7 +86,6 @@ public class UserServiceImpl implements UserService {
         userRepo.updatePassword(user.getId(), passwordEncoder.encode(newPassword));
     }
 
-    ///////
     @Override
     public boolean isEmailUnique(Integer id, String email) { // Use for update User
         User userByEmail = userRepo.getUserByEmail(email);
@@ -131,6 +129,25 @@ public class UserServiceImpl implements UserService {
         }
 
         return userRepo.save(user);
+    }
+
+    @Override
+    public User updateAccount(User userInForm) {
+        User userInDB = userRepo.findById(userInForm.getId()).get();
+
+        if(!userInForm.getPassword().isEmpty()) {
+            userInDB.setPassword(userInForm.getPassword());
+            encodePassword(userInDB);
+        }
+
+        if(userInForm.getPhotos() != null) {
+            userInDB.setPhotos(userInForm.getPhotos());
+        }
+
+        userInDB.setFirstName(userInForm.getFirstName());
+        userInDB.setLastName(userInForm.getLastName());
+
+        return userRepo.save(userInDB);
     }
 
     @Override

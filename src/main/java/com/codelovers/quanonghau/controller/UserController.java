@@ -9,6 +9,7 @@ import com.codelovers.quanonghau.security.payload.SignupRequest;
 import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
 import com.codelovers.quanonghau.util.FileUploadUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
@@ -73,7 +74,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/user", produces = "application/json")
-    public ResponseEntity<?> getUserById(@Param("id") Integer id){
+    public ResponseEntity<?> getUserById(@RequestParam("id") Integer id){
 
         User user = userSer.findById(id);
         System.out.println("Path: " + user.getPhotosImagePath());
@@ -145,38 +146,13 @@ public class UserController {
 
     //can use @RequestParam("image"), this API create User By ADMIN or update USER
     // User user is must input form-data
-    @PostMapping(value = "/user/save",consumes = "multipart/form-data", produces = "application/json")
-    public ResponseEntity<?> saveUser(User user, @RequestParam(name = "imageFile") MultipartFile file,String listRoles) throws IOException {
+    @PostMapping(value = "/user/save",consumes = {"multipart/form-data"}, produces = "application/json")
+    public ResponseEntity<?> saveUser(String userJson, @RequestParam(name = "imageFile") MultipartFile file) throws IOException {
 
-        Set<Role> roles = new HashSet<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = objectMapper.readValue(userJson, User.class);
 
-        if(listRoles.isEmpty()){
-            Role userRole = roleSer.findByName(Contrants.USER);
-            roles.add(userRole);
-        }
-        else {
-            // Need check value
-            String[] arr = null;
-            if(listRoles.contains(",")){
-                arr = listRoles.trim().split(",");
-            }
-            else{
-                arr[0] = listRoles.trim();
-            }
-
-            for (String role : arr){
-                if ("ADMIN".equals(role.trim())) {
-                    Role roleAdmin = roleSer.findByName(Contrants.ADMIN);
-                    roles.add(roleAdmin);
-                } else {
-                    Role userRole = roleSer.findByName(Contrants.USER);
-                    roles.add(userRole);
-                }
-            }
-        }
-
-        user.setRoles(roles);
-
+        System.out.println(user.getRoles());
         if (!file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
@@ -196,7 +172,7 @@ public class UserController {
         return new ResponseEntity<>(user ,HttpStatus.OK);
     }
 
-    // Get user information for edit form for USER , need code DTO
+    // Get user information for edit form for USER , need code DTO for send Object json
     @GetMapping(value = "/user/edit/{id}", produces = "application/json")
     public ResponseEntity<?> editUser(@PathVariable(name = "id") Integer id){
         User user = userSer.findById(id);
@@ -215,7 +191,7 @@ public class UserController {
 
         user.setRoles(roles);
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/user/delete/{id}", produces = "application/json")
