@@ -75,7 +75,6 @@ public class UserController {
 
     @GetMapping(value = "/user", produces = "application/json")
     public ResponseEntity<?> getUserById(@RequestParam("id") Integer id){
-
         User user = userSer.findById(id);
         System.out.println("Path: " + user.getPhotosImagePath());
         if(user == null){
@@ -106,7 +105,6 @@ public class UserController {
     // Tạo USER mới để test
     @PostMapping(value = "/user/create", produces = "application/json")
     public ResponseEntity<?> createUser(@Validated @RequestBody SignupRequest signupRequest){
-
         if(userSer.exitUserByEmail(signupRequest.getEmail())){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -148,7 +146,6 @@ public class UserController {
     // User user is must input form-data
     @PostMapping(value = "/user/save",consumes = {"multipart/form-data"}, produces = "application/json")
     public ResponseEntity<?> saveUser(String userJson, @RequestParam(name = "imageFile") MultipartFile file) throws IOException {
-
         ObjectMapper objectMapper = new ObjectMapper();
         User user = objectMapper.readValue(userJson, User.class);
 
@@ -194,12 +191,15 @@ public class UserController {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/user/delete/{id}", produces = "application/json")
+    @GetMapping(value = "/user/delete/{id}", produces = "application/json")
     public ResponseEntity<?> removeUser(@PathVariable("id") Integer id) {
 
         try {
             userSer.deleteUser(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            String userDir = "images/user-photo/" +id;
+
+            FileUploadUtil.removeDir(userDir);
+            return new ResponseEntity<>("Delete done" + id,HttpStatus.NO_CONTENT);
         } catch (UserNotFoundException ex){
             System.out.println(ex.getMessage());
             return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);

@@ -112,6 +112,5 @@ public class CategoryController {
         } catch (CategoryNotFoundException ex) {
             return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
         }
-
     }
 }

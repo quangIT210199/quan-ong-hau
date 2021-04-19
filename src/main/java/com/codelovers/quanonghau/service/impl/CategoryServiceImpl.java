@@ -5,6 +5,7 @@ import com.codelovers.quanonghau.exception.CategoryNotFoundException;
 import com.codelovers.quanonghau.repository.CategoryRepository;
 import com.codelovers.quanonghau.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -21,7 +22,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> listAll() {
-       List<Category> rootCategories =  categoryRepo.findRootCategories();
+       List<Category> rootCategories =  categoryRepo.findRootCategories(Sort.by("name").ascending());
 
         return listHierarchicalCategories(rootCategories);
     }
@@ -61,12 +62,52 @@ public class CategoryServiceImpl implements CategoryService {
             name += subCategory.getName();
             hierarchicalCategories.add(Category.copyFull(subCategory, name));
 
-            listSubCategoriesUsedInForm(hierarchicalCategories, subCategory, sublevel);
+            listSubHierachicalCategories(hierarchicalCategories, subCategory, sublevel);
         }
     }
-
     //////////////
+    // Get Info for Form
+    public List<Category> listCategoryUsedInForm() {
+        List<Category> categoriesUsedInForm = new ArrayList<>();
 
+        Iterable<Category> categoriesDB = categoryRepo.findRootCategories(Sort.by("name").ascending());
+
+        for (Category category : categoriesDB) {
+            if(category.getParent() == null) {
+                //Get Id and Name
+                categoriesUsedInForm.add(Category.copyIdAndName(category));
+
+                Set<Category> children = category.getChildren();
+
+                for(Category subCategory : children) {
+                    String name = "--" + subCategory.getName();
+                    categoriesUsedInForm.add(Category.copyIdAndName(subCategory.getId(), name));
+
+                    listSubCategoriesUsedInForm(categoriesUsedInForm, subCategory, 1);
+                }
+            }
+        }
+
+        return categoriesUsedInForm;
+    }
+
+    private void listSubCategoriesUsedInForm(List<Category> categoriesUsedInForm, Category parent,
+                                             int sublevel) {
+        int newSublevel = sublevel + 1;
+        Set<Category> children = parent.getChildren();
+
+        for (Category subCategory : children) {
+            String name ="";
+            for (int i = 0 ; i < newSublevel; i++) {
+                name += "--";
+            }
+
+            name += subCategory.getName();
+            categoriesUsedInForm.add(Category.copyIdAndName(subCategory.getId(), name));
+            listSubCategoriesUsedInForm(categoriesUsedInForm, subCategory, sublevel);
+        }
+    }
+    // Get Info for Form
     @Override
     public Category saveCategory(Category category) {
         return categoryRepo.save(category);
@@ -126,49 +167,4 @@ public class CategoryServiceImpl implements CategoryService {
 
         categoryRepo.deleteById(id);
     }
-
-    // Get Info for Form
-    public List<Category> listCategoryUsedInForm() {
-        List<Category> categoriesUsedInForm = new ArrayList<>();
-
-        Iterable<Category> categoriesDB = categoryRepo.findAll();
-
-        for (Category category : categoriesDB) {
-            if(category.getParent() == null) {
-                //Get Id and Name
-                categoriesUsedInForm.add(Category.copyIdAndName(category));
-
-                Set<Category> children = category.getChildren();
-
-                for(Category subCategory : children) {
-                    String name = "--" + subCategory.getName();
-                    categoriesUsedInForm.add(Category.copyIdAndName(subCategory.getId(), name));
-
-                    listSubCategoriesUsedInForm(categoriesUsedInForm, subCategory, 1);
-                }
-            }
-        }
-
-        return categoriesUsedInForm;
-    }
-
-    private void listSubCategoriesUsedInForm(List<Category> categoriesUsedInForm, Category parent,
-                              int sublevel) {
-        int newSublevel = sublevel + 1;
-        Set<Category> children = parent.getChildren();
-
-        for (Category subCategory : children) {
-            String name ="";
-            for (int i = 0 ; i < newSublevel; i++) {
-                name += "--";
-            }
-
-            name += subCategory.getName();
-            categoriesUsedInForm.add(Category.copyIdAndName(subCategory.getId(), name));
-            listSubCategoriesUsedInForm(categoriesUsedInForm, subCategory, sublevel);
-        }
-    }
-    // Get Info for Form
-
-    //Check enabled
 }
