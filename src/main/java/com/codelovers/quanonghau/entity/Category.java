@@ -100,7 +100,7 @@ public class Category implements Serializable {
         this.image = "default.png";
     }
 
-    public Category(Integer id, String name, String alias) {
+    public Category(Integer id, String name, String alias) {// For Test
         super();
         this.id = id;
         this.name = name;

@@ -1,6 +1,7 @@
 package com.codelovers.quanonghau.repository;
 
 import com.codelovers.quanonghau.entity.Category;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -14,4 +15,9 @@ public interface CategoryRepository extends PagingAndSortingRepository<Category,
     Category findByName(String name);
 
     Category findByAlias(String alias);
+
+    @Query("UPDATE Category c SET c.enabled = ?2 WHERE c.id = ?1")
+    @Modifying
+    void updateCategoryEnabledStatus(Integer id, boolean enabled);
 }
+

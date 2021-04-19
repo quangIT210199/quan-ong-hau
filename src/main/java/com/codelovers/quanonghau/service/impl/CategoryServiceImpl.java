@@ -1,16 +1,19 @@
 package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.entity.Category;
+import com.codelovers.quanonghau.exception.CategoryNotFoundException;
 import com.codelovers.quanonghau.repository.CategoryRepository;
 import com.codelovers.quanonghau.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional
 public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
@@ -76,6 +79,54 @@ public class CategoryServiceImpl implements CategoryService {
         return category;
     }
 
+    @Override
+    public String checkUnique(Integer id, String name, String alais) {
+        boolean isCreatingNew = (id == null || id == 0);
+
+        Category categoryByName = categoryRepo.findByName(name);
+
+        if(isCreatingNew) {
+            if (categoryByName != null) {
+                return "Duplicate Name @@";
+            }
+            else {
+                Category categoryByAlais = categoryRepo.findByAlias(alais);
+                if(categoryByAlais != null) {
+                    return "Duplicate Alias @@";
+                }
+            }
+        }
+        else {
+            if (categoryByName != null && categoryByName.getId() != id) {
+                return "Duplicate Name @@";
+            }
+            else {
+                Category categoryByAlais = categoryRepo.findByAlias(alais);
+                if(categoryByAlais != null && categoryByAlais.getId() != id) {
+                    return "Duplicate Alias @@";
+                }
+            }
+        }
+
+        return "Not Unique";
+    }
+
+    @Override
+    public void updateCategoryEnableStatus(Integer id, boolean enabled) {
+        categoryRepo.updateCategoryEnabledStatus(id, enabled);
+    }
+
+    @Override
+    public void deleteCategoryById(Integer id) throws CategoryNotFoundException {
+        Long count = categoryRepo.count();
+
+        if(count == null || count == 0) {
+            throw new CategoryNotFoundException("Counld not found category");
+        }
+
+        categoryRepo.deleteById(id);
+    }
+
     // Get Info for Form
     public List<Category> listCategoryUsedInForm() {
         List<Category> categoriesUsedInForm = new ArrayList<>();
@@ -119,4 +170,5 @@ public class CategoryServiceImpl implements CategoryService {
     }
     // Get Info for Form
 
+    //Check enabled
 }
