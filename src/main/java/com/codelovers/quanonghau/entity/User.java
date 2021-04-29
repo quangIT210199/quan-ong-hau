@@ -44,12 +44,12 @@ public class User implements Serializable {
     @Column(name = "enabled")
     private boolean enabled;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) // CascadeType.PERSIST: khi thêm sẽ ảnh hưởng tới các modal liên kết
     List<CartItem> cartItems = new ArrayList<>();
 
-//    @JsonIgnore
+//    @JsonIgnore @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Fetch(FetchMode.JOIN)
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
             name ="user_role",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -178,22 +178,5 @@ public class User implements Serializable {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", photos='" + photos + '\'' +
-                ", phoneNumber=" + phoneNumber +
-                ", address='" + address + '\'' +
-                ", enabled=" + enabled +
-                ", cartItems=" + cartItems +
-                ", roles=" + roles +
-                '}';
     }
 }

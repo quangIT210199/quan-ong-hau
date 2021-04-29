@@ -4,8 +4,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "product_image")
-public class ProductImage implements Serializable {
+@Table(name = "product_details")
+public class ProductDetails implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -13,21 +13,15 @@ public class ProductImage implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", length = 255, nullable = false)
     private String name;
+
+    @Column(name = "value", length = 255, nullable = false)
+    private String value;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-
-    public ProductImage() {
-    }
-
-    public ProductImage(Integer id, String name, Product product) {
-        this.id = id;
-        this.name = name;
-        this.product = product;
-    }
 
     public Integer getId() {
         return id;
@@ -43,6 +37,14 @@ public class ProductImage implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public Product getProduct() {

@@ -1,5 +1,6 @@
 package com.codelovers.quanonghau.security.jwt;
 
+import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.security.UserDetailsServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -68,6 +70,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
+//        String token = "";
+//
+//        Cookie[] cookies = null;
+//        cookies = request.getCookies();
+//        for (Cookie cookie : cookies){
+//            if (cookie.getName().equals(Contrants.TOKEN)) {
+//                token = cookie.getValue();
+//            }
+//        }
+//
+//        if(token != null) {
+//            return token;
+//        }
+
         String bearerToken = request.getHeader("Authorization");
         // Kiểm tra xem header Authorization có chứa thông tin jwt không
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {

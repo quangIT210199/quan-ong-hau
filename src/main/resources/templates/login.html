@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0">
+    <title>Test Login</title>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https:/stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<!--    <meta name="_csrf" th:content="${_csrf.token}"/>-->
+    <!-- default header name is X-CSRF-TOKEN -->
+<!--    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
+
+<!--    <meta name="_jwt" th:content="${accessToken}"/>-->
+</head>
+<body>
+    <div class="container-fluid text-center">
+        <form th:action="@{login}" method="post" style="max-width: 350px; margin: 0 auto">
+
+            <div class="border border-secondary rounded p-3">
+                <p>
+                    <input type="email" name="email" class="form-control" placeholder="Email" required id="input-email">
+                </p>
+                <p>
+                    <input type="password" name="password" class="form-control" placeholder="Password" required id="input-password">
+                </p>
+                <p>
+                    <input type="submit" value="Login" class="btn btn-primary" />
+                </p>
+<!--                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />-->
+            </div>
+        </form>
+    </div>
+<script>
+    // $("#form-login").submit(function (event) {
+    //     /* stop form from submitting normally */
+    //     event.preventDefault();
+    //
+    //     data = {
+    //         email: $("#input-email").val(),
+    //         password: $("#input-password").val()
+    //     }
+    //
+    //     console.log(data);
+    //
+    //     var request = $.ajax({
+    //         type: "post",
+    //         url: "http://localhost:8081/api/login",
+    //         data: JSON.stringify(data),
+    //         contentType: "application/json",
+    //     });
+    //
+    //     request.done(function (response, textStatus, jqXHR) {
+    //         // Log a message to the console
+    //         console.log("Login OK!");
+    //         console.log(response);
+    //         window.location.href= "/index"
+    //     });
+    //
+    //     request.fail(function (jqXHR, textStatus) {
+    //         console.log("Sai");
+    //     });
+    // });
+
+</script>
+</body>
+</html>

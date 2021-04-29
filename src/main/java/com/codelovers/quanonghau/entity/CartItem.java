@@ -35,7 +35,7 @@ public class CartItem implements Serializable {
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    // method getSubtotal dont use in Seriable
+    // method getSubtotal doesn't use in Seriable
     @Transient
     public float getSubtotal(){
         return this.product.getPrice() * quantity;

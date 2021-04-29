@@ -10,6 +10,7 @@ import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -71,8 +72,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .cors() // Ngăn chặn request từ một domain khác
                 .and()
-                .csrf()
-                .disable()
+//                .csrf()
+//                .disable()
                 .authorizeRequests()
                 .antMatchers("/api/login").permitAll() // Cho phép tất cả mọi người truy cập vào địa chỉ này
                 .antMatchers("/api/signup").permitAll()
@@ -82,7 +83,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/bills/**").hasRole("ADMIN")
                 .anyRequest().authenticated()// Tất cả các request khác đều cần phải xác thực mới được truy cập
                 .and()
-                .logout().permitAll();
+                .formLogin()
+                .loginPage("/login")
+                .loginProcessingUrl("/login_page")
+                .permitAll()
+                .usernameParameter("email")
+                .passwordParameter("password");
 
         // Thêm một lớp Filter kiểm tra jwt
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -92,6 +98,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 //                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
+
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**");
+//    }
     /*
     hasRole, hasAnyRole
     hasAuthority, hasAnyAuthority
