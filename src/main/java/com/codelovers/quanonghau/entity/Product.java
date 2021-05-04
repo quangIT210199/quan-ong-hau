@@ -40,11 +40,11 @@ public class Product implements Serializable{
     @Column(name = "price")
     private float price;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private Set<ProductImage> images = new HashSet<>();
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductDetails> details = new ArrayList<>();
+//    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+//    private Set<ProductImage> images = new HashSet<>();
+//
+//    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+//    private List<ProductDetails> details = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
@@ -121,21 +121,21 @@ public class Product implements Serializable{
         this.price = price;
     }
 
-    public Set<ProductImage> getImages() {
-        return images;
-    }
-
-    public void setImages(Set<ProductImage> images) {
-        this.images = images;
-    }
-
-    public List<ProductDetails> getDetails() {
-        return details;
-    }
-
-    public void setDetails(List<ProductDetails> details) {
-        this.details = details;
-    }
+//    public Set<ProductImage> getImages() {
+//        return images;
+//    }
+//
+//    public void setImages(Set<ProductImage> images) {
+//        this.images = images;
+//    }
+//
+//    public List<ProductDetails> getDetails() {
+//        return details;
+//    }
+//
+//    public void setDetails(List<ProductDetails> details) {
+//        this.details = details;
+//    }
 
     public List<CartItem> getCartItems() {
         return cartItems;

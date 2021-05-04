@@ -38,6 +38,12 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    public void removeBill(Integer bid) {
+
+//        billRepo.;
+    }
+
+    @Override
     public List<Bill> findAllBillByUserId(Integer userId) { // chưa xong
         User u = userRepo.findById(userId).orElse(null);
         if(u == null){
@@ -45,7 +51,6 @@ public class BillServiceImpl implements BillService {
         }
         Bill b = null;
         b.getCartItems().get(0).getUser().getId();
-
 
         return null;
     }

@@ -10,5 +10,7 @@ public interface BillService {
 
     Bill findById(Integer billId);
 
+    void removeBill(Integer bid);
+
     List<Bill> findAllBillByUserId(Integer userId);
 }

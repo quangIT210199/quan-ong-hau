@@ -66,4 +66,10 @@ public class BillRestController {
 
         return new ResponseEntity<>("Tạo Bill thành công!",HttpStatus.OK);
     }
+
+//    @DeleteMapping(value = "/bill/remove/{bid}", produces = "application/json")
+//    public ResponseEntity<?> removeBill(@PathVariable(name = "pid") Integer bid) {
+//
+//
+//    }
 }
