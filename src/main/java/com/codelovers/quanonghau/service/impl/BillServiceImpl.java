@@ -1,6 +1,7 @@
 package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.entity.Bill;
+import com.codelovers.quanonghau.entity.CartItem;
 import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.repository.BillRepository;
 import com.codelovers.quanonghau.repository.CartItemRepository;
@@ -10,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -39,8 +42,9 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public void removeBill(Integer bid) {
+        Bill bill = billRepo.findById(bid).orElse(null);
 
-//        billRepo.;
+        billRepo.delete(bill);
     }
 
     @Override
@@ -49,9 +53,18 @@ public class BillServiceImpl implements BillService {
         if(u == null){
             return null;
         }
-        Bill b = null;
-        b.getCartItems().get(0).getUser().getId();
+        // Get list billIds
+        Set<Integer> listBillId = cartItemRepo.findBillsByUserId(userId);
+        if(listBillId == null)
+            return null;
 
-        return null;
+        // Get List Bill
+        List<Bill> listBill = new ArrayList<>();
+        for (Integer id : listBillId) {
+            Bill b = billRepo.findById(id).orElse(null);
+            listBill.add(b);
+        }
+        
+        return listBill;
     }
 }

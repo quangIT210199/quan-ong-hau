@@ -7,7 +7,10 @@ import com.codelovers.quanonghau.service.CartItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/bills")
@@ -20,7 +23,7 @@ public class BillRestController {
     CartItemService cartItemSer;
 
     @GetMapping(value = "/bill/{bid}", produces = "application/json")
-    public ResponseEntity<?> getBill(@PathVariable Integer bid){
+    public ResponseEntity<?> getBill(@PathVariable(name = "bid") Integer bid){
 
         Bill bill = billSer.findById(bid);
         if(bill == null){
@@ -30,13 +33,20 @@ public class BillRestController {
         return new ResponseEntity<>(bill, HttpStatus.OK);
     }
 
-//    @GetMapping(value = "/bill/{uid}", produces = "application/json")
-//    public ResponseEntity<?>showBillOfUser(@PathVariable Integer uid){
-//        // Làm authen để xác định user
-//        List<Bill> listBill = billSer.findAllBillByUserId(uid);
+//    @GetMapping(value = "/bill/page", produces = "application/json")
+//    public ResponseEntity<?> listBill(@RequestParam(value = "pageNum") Integer pageNum, @RequestParam(value = "sortField") String sortField,
+//                                      @RequestParam(value = "sortDir") String sortDir, @RequestParam("keyword") String keyword) {
 //
-//        return null;
 //    }
+
+    // Get info bill ID of user by id
+    @GetMapping(value = "/bill", produces = "application/json")
+    public ResponseEntity<?>showBillOfUser(@RequestParam(value = "uid") Integer uid){
+        // Làm authen để xác định user
+        List<Bill> listBill = billSer.findAllBillByUserId(uid);
+
+        return new ResponseEntity<>(listBill, HttpStatus.OK);
+    }
 
     // Tạo Bill khi click btn CheckOut và gán billId cho các sp trong giỏ hàng
     @PostMapping(value = "/bill/{uid}", produces = "application/json")
@@ -67,9 +77,16 @@ public class BillRestController {
         return new ResponseEntity<>("Tạo Bill thành công!",HttpStatus.OK);
     }
 
-//    @DeleteMapping(value = "/bill/remove/{bid}", produces = "application/json")
-//    public ResponseEntity<?> removeBill(@PathVariable(name = "pid") Integer bid) {
-//
-//
-//    }
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @DeleteMapping(value = "/bill/remove/{bid}", produces = "application/json")
+    public ResponseEntity<?> removeBill(@PathVariable(name = "bid") Integer bid) {
+        Bill bill = billSer.findById(bid);
+
+        if(bill == null){
+            return new ResponseEntity<>("Không tồn tại", HttpStatus.NO_CONTENT);
+        }
+
+        billSer.removeBill(bid);
+        return new ResponseEntity<>("DONE", HttpStatus.OK);
+    }
 }

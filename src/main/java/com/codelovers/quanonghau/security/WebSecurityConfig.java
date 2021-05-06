@@ -81,12 +81,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/bills/**").hasRole("ADMIN")
                 .anyRequest().authenticated()// Tất cả các request khác đều cần phải xác thực mới được truy cập
                 .and()
-                .formLogin()
+                .logout()
+                .permitAll();
+//                .formLogin()
 //                .loginPage("/login")
 //                .loginProcessingUrl("/login_page")
-                .permitAll()
-                .usernameParameter("email")
-                .passwordParameter("password");
+//                .permitAll()
+//                .usernameParameter("email")
+//                .passwordParameter("password");
 //                .and()
 //                .logout()
 //                .invalidateHttpSession(true)

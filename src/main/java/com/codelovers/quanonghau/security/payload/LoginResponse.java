@@ -29,6 +29,14 @@ public class LoginResponse {
         return id;
     }
 
+    public String getTokenType() {
+        return tokenType;
+    }
+
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
+    }
+
     public void setId(Integer id) {
         this.id = id;
     }

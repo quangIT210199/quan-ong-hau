@@ -19,9 +19,9 @@ public class ProductDetails implements Serializable {
     @Column(name = "value", length = 255, nullable = false)
     private String value;
 
-//    @ManyToOne
-//    @JoinColumn(name = "product_id")
-//    private Product product;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     public Integer getId() {
         return id;
@@ -47,11 +47,11 @@ public class ProductDetails implements Serializable {
         this.value = value;
     }
 
-//    public Product getProduct() {
-//        return product;
-//    }
-//
-//    public void setProduct(Product product) {
-//        this.product = product;
-//    }
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 }

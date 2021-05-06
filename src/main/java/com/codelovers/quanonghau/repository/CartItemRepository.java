@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
@@ -32,10 +33,14 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     @Modifying
     void updateBillId(Integer billId, Integer cartId);
 
-    // Delete Cart Item doesn't have Bill
+    // Delete Cart Item doesn't have Bill id
     @Query("DELETE FROM CartItem c WHERE c.product.id = ?1 AND c.user.id = ?2 AND c.bill.id IS NULL")
     @Modifying
     void deleteProductAndUser(Integer productId, Integer userId);
 
     CartItem findByIdAndUser(Integer cartItemId, User user);
+
+    // Get Arrays Bill ids by User Id
+    @Query(value = "SELECT c.bill_id FROM cart_item c WHERE c.user_id = ?1 AND C.bill_id IS NOT NULL", nativeQuery = true)
+    Set<Integer> findBillsByUserId(Integer userId);
 }

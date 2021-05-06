@@ -20,7 +20,7 @@ public class Category implements Serializable {
     private Integer id;
 
 //    @OneToMany(mappedBy = "category")
-//    private List<Product> products = new ArrayList<>();
+//    private List<Product> products = new ArrayList<>(); // k cần tham chiếu tới bất kì sản phẩm nào -> không dùng
 
     @Column(name = "name", length = 128, nullable = false, unique = true)
     private String name;
