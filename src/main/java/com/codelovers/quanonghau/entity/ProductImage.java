@@ -40,7 +40,7 @@ public class ProductImage implements Serializable {
 
     @Transient
     public String getImagePath() {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/product-photo/" + product.getId() + "/extras/" + this.name).toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/product-photo/" + product.getId() + "/extras/" + this.name).toUriString();
     }
 
     public Integer getId() {

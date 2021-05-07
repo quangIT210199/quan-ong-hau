@@ -52,6 +52,7 @@ public class Product implements Serializable{
     @Column(name = "main_image", nullable = false)
     private String mainImage;
 
+    // orphanRemoval: Mối đối tượng company sẽ chứa 1 tập hợp các đối tượng employee, khi một đối tượng employee bị xóa khỏi tập hợp đó thì nó sẽ bị xóa khỏi database.
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductImage> images = new HashSet<>();
 
@@ -80,10 +81,10 @@ public class Product implements Serializable{
     @Transient
     public String getMainImagePath() {
         if (id == null || mainImage == null ) {
-            return ServletUriComponentsBuilder.fromCurrentContextPath().path("/product-photo/default-user.png").toUriString();
+            return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/product-photo/default-user.png").toUriString();
         }
 
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("product-photo/" + this.id + "/" + this.mainImage).toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/product-photo/" + this.id + "/" + this.mainImage).toUriString();
     }
     ///
 

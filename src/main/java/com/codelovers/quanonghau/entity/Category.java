@@ -50,9 +50,9 @@ public class Category implements Serializable {
 
     @Transient
     public String getImagePath() {
-        if (id == null || image == null) return ServletUriComponentsBuilder.fromCurrentContextPath().path("/category-photo/default-user.png").toUriString();
+        if (id == null || image == null) return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/category-photo/default-user.png").toUriString();
 
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("category-photo/" + this.id + "/" + this.image).toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/category-photo/" + this.id + "/" + this.image).toUriString();
     }
 
     // Tạo subCate

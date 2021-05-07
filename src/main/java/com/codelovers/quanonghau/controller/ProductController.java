@@ -1,5 +1,6 @@
 package com.codelovers.quanonghau.controller;
 
+import com.codelovers.quanonghau.dto.EditProductDTO;
 import com.codelovers.quanonghau.dto.NewProductDTO;
 import com.codelovers.quanonghau.entity.Category;
 import com.codelovers.quanonghau.entity.Product;
@@ -49,18 +50,49 @@ public class ProductController {
     }
 
     @PostMapping(value = "/product/save", produces = "application/json")
-    public ResponseEntity<?> saveProduct(String productJson, @RequestParam("fileImage") MultipartFile mainImage,
-                                         @RequestParam("extraImage") MultipartFile[] extraImage) throws IOException {
+    public ResponseEntity<?> saveProduct(String productJson,
+                                         @RequestParam(value = "fileImage", required = false) MultipartFile mainImage,
+                                         @RequestParam(value = "extraImage", required = false) MultipartFile[] extraImage,
+                                         @RequestParam(value = "detailNames", required = false) String[] detailNames,
+                                         @RequestParam(value = "detailValues", required = false) String[] detailValues,
+                                         @RequestParam(value = "imageIDs", required = false) Integer[] imageIDs,
+                                         @RequestParam(value = "imageNames", required = false) String[] imageNames) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         Product product = mapper.readValue(productJson, Product.class);
 
         setExtraImageNames(extraImage, product);
+
+        setExistingExtraImageNames(imageIDs, imageNames, product); // Set image for Extra Image already have in server
+
         setMainImageName(mainImage, product);
+        setProductDetails(detailNames, detailValues, product);
 
         Product savedProduct = productSer.saveProduct(product);
+
         saveUploadImages(mainImage, extraImage, savedProduct);
 
         return new ResponseEntity(product, HttpStatus.OK);
+    }
+
+    private void setExistingExtraImageNames(Integer[] imageIDs, String[] imageNames, Product product) {
+        if (imageIDs == null || imageIDs.length == 0) return;
+
+        for (int count = 0; count < imageIDs.length; count++) {
+//            String
+        }
+    }
+
+    private void setProductDetails(String[] detailNames, String[] detailValues, Product product) {
+        if (detailNames == null || detailNames.length == 0) return;
+
+        for (int count = 0; count < detailNames.length; count++) {
+            String name = detailNames[count];
+            String value = detailValues[count];
+
+            if(!name.isEmpty() && !value.isEmpty()) {
+                product.addDetails(name, value);
+            }
+        }
     }
 
     private void saveUploadImages(MultipartFile mainImage, MultipartFile[] extraImage, Product savedProduct) throws IOException {
@@ -99,6 +131,24 @@ public class ProductController {
         if (!mainImageFile.isEmpty()) {
             String fileName = StringUtils.cleanPath(mainImageFile.getOriginalFilename());
             product.setMainImage(fileName);
+        }
+    }
+
+    @GetMapping(value = "/product/edit" , produces = "application/json")
+    public ResponseEntity<?> editProduct(@RequestParam(value = "id") Integer id) {
+        try {
+            Product product = productSer.get(id);
+            List<Category> categoryList = categorySer.listAll();
+            Integer numberOfExistingExtraImages = product.getImages().size();
+
+            EditProductDTO editProductDTO = new EditProductDTO();
+            editProductDTO.setProduct(product);
+            editProductDTO.setCategoryList(categoryList);
+            editProductDTO.setNumberOfExistingExtraImages(numberOfExistingExtraImages);
+
+            return new ResponseEntity<>(editProductDTO, HttpStatus.OK);
+        } catch (ProductNotFoundException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 

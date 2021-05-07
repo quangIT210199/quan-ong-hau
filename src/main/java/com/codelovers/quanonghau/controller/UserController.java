@@ -156,7 +156,7 @@ public class UserController {
             user.setPhotos(fileName);
             User savedUser = userSer.createdUser(user);
 
-            String uploadDir = "src/main/resources/static/user-photo/" + savedUser.getId();
+            String uploadDir = "images/user-photo/" + savedUser.getId();
 
             FileUploadUtil.cleanDir(uploadDir);
             FileUploadUtil.saveFile(uploadDir, fileName, file);

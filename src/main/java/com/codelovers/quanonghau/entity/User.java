@@ -64,9 +64,9 @@ public class User implements Serializable {
 
     @Transient
     public String getPhotosImagePath() {
-        if (id == null || photos == null) return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user-photo/default-user.png").toUriString();
+        if (id == null || photos == null) return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/user-photo/default-user.png").toUriString();
 
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("user-photo/" + this.id + "/" + this.photos).toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/user-photo/" + this.id + "/" + this.photos).toUriString();
     }
 
     public boolean hasRole(String roleName) {
