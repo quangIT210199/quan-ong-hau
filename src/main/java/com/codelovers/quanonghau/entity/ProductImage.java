@@ -1,10 +1,13 @@
 package com.codelovers.quanonghau.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "product_image")
+@Table(name = "product_images")
 public class ProductImage implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -18,15 +21,26 @@ public class ProductImage implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
 
     public ProductImage() {
+    }
+
+    public ProductImage(String name, Product product) {
+        this.name = name;
+        this.product = product;
     }
 
     public ProductImage(Integer id, String name, Product product) {
         this.id = id;
         this.name = name;
         this.product = product;
+    }
+
+    @Transient
+    public String getImagePath() {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/product-photo/" + product.getId() + "/extras/" + this.name).toUriString();
     }
 
     public Integer getId() {

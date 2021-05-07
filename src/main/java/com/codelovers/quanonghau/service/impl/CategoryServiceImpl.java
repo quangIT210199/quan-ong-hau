@@ -149,7 +149,7 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
 
-        return "Not Unique";
+        return "OK";
     }
 
     @Override
@@ -162,7 +162,7 @@ public class CategoryServiceImpl implements CategoryService {
         Long count = categoryRepo.count();
 
         if(count == null || count == 0) {
-            throw new CategoryNotFoundException("Counld not found category");
+            throw new CategoryNotFoundException("Counld not found category with ID: " + id);
         }
 
         categoryRepo.deleteById(id);

@@ -1,13 +1,13 @@
 package com.codelovers.quanonghau.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 
 @Entity
-@Table(name = "product")
+@Table(name = "products")
 public class Product implements Serializable{
 
     private static final long serialVersionUID = 1L;
@@ -23,17 +23,20 @@ public class Product implements Serializable{
     @Column(name = "alias", length = 256, nullable = false, unique = true)
     private String alias; // Bí danh
 
-    @Column(name = "description", length = 4096, nullable = false)
-    private String description;
+    @Column(name = "full_description", length = 4096, nullable = false)
+    private String fullDescription;
+
+    @Column(name = "short_description", length = 1024, nullable = false)
+    private String shortDescription;
 
     @Column(name = "in_stock")
     private boolean inStock;
 
     @Column(name = "created_time")
-    private Date createdTime;
+    private String createdTime;
 
     @Column(name = "updated_time")
-    private Date updatedTime;
+    private String updatedTime;
 
     private boolean enabled;
 
@@ -46,22 +49,43 @@ public class Product implements Serializable{
     @Column(name = "discount_percent")
     private float discountPercent;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @Column(name = "main_image", nullable = false)
+    private String mainImage;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductImage> images = new HashSet<>();
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductDetails> details = new ArrayList<>(); // Sản phẩm cần tham chiếu tới các Chi tiết nên cần sử dụng
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "category_id")
     private Category category; // tham chiếu khóa ngoại
 
     public Product() {
     }
+
+    public void addDetails(String name, String value) {
+        this.details.add(new ProductDetails(name, value, this));
+    }
+
+    // Extra Image
+    public void addExtraImage(String imageName) {
+        this.images.add(new ProductImage(imageName, this));
+    }
+
+    @Transient
+    public String getMainImagePath() {
+        if (id == null || mainImage == null ) {
+            return ServletUriComponentsBuilder.fromCurrentContextPath().path("/product-photo/default-user.png").toUriString();
+        }
+
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("product-photo/" + this.id + "/" + this.mainImage).toUriString();
+    }
+    ///
 
     public float getDiscountPercent() {
         return discountPercent;
@@ -95,12 +119,20 @@ public class Product implements Serializable{
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getFullDescription() {
+        return fullDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setFullDescription(String fullDescription) {
+        this.fullDescription = fullDescription;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
     }
 
     public boolean isInStock() {
@@ -119,19 +151,19 @@ public class Product implements Serializable{
         this.alias = alias;
     }
 
-    public Date getCreatedTime() {
+    public String getCreatedTime() {
         return createdTime;
     }
 
-    public void setCreatedTime(Date createdTime) {
+    public void setCreatedTime(String createdTime) {
         this.createdTime = createdTime;
     }
 
-    public Date getUpdatedTime() {
+    public String getUpdatedTime() {
         return updatedTime;
     }
 
-    public void setUpdatedTime(Date updatedTime) {
+    public void setUpdatedTime(String updatedTime) {
         this.updatedTime = updatedTime;
     }
 
@@ -181,5 +213,13 @@ public class Product implements Serializable{
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public String getMainImage() {
+        return mainImage;
+    }
+
+    public void setMainImage(String mainImage) {
+        this.mainImage = mainImage;
     }
 }

@@ -5,11 +5,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "category")
+@Table(name = "categorys")
 public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -19,7 +21,7 @@ public class Category implements Serializable {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-//    @OneToMany(mappedBy = "category")
+//    @OneToMany(mappedBy = "category", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 //    private List<Product> products = new ArrayList<>(); // k cần tham chiếu tới bất kì sản phẩm nào -> không dùng
 
     @Column(name = "name", length = 128, nullable = false, unique = true)
@@ -38,11 +40,11 @@ public class Category implements Serializable {
 
     // Tu tham chieu de phan cap thu bac danh muc
     // https://stackoverflow.com/questions/2302802/how-to-fix-the-hibernate-object-references-an-unsaved-transient-instance-save
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "parent_id")
     private Category parent;
 
-    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "parent")
     @JsonIgnore
     private Set<Category> children = new HashSet<>();
 

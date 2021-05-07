@@ -1,5 +1,7 @@
 package com.codelovers.quanonghau.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -21,7 +23,18 @@ public class ProductDetails implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
+
+    public ProductDetails(String name, String value, Product product) {
+        this.name = name;
+        this.value = value;
+        this.product = product;
+    }
+
+    public ProductDetails() {
+
+    }
 
     public Integer getId() {
         return id;
