@@ -34,7 +34,7 @@ public class Category implements Serializable {
     private String image;
 
     @Column(name = "all_parent_ids", length = 256, nullable = true)
-    private String allParentIDs;
+    private String allParentIDs; // need field for store Parent Id with format -1- or -1-5-
 
     private boolean enabled;
 

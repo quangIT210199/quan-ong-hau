@@ -48,7 +48,7 @@ public class UserController {
         Page<User> page = userSer.listByPage(pageNum, sortField,sortDir, keyword);
 
         List<User> listUser = page.getContent();
-        long startCount = (pageNum - 1) * Contrants.USERS_PER_PAGE + 1;// Start in index element
+        long startCount = (pageNum - 1) * Contrants.USERS_PER_PAGE + 1;// Start at index element
         long endCount = startCount + Contrants.USERS_PER_PAGE - 1; // End element
 
         if(endCount > page.getTotalElements()){
@@ -142,19 +142,21 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    // Cần tách ra làm 2 API (1)
     //can use @RequestParam("image"), this API create User By ADMIN or update USER
     // User user is must input form-data
     @PostMapping(value = "/user/save",consumes = {"multipart/form-data"}, produces = "application/json")
     public ResponseEntity<?> saveUser(String userJson, @RequestParam(name = "imageFile") MultipartFile file) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = objectMapper.readValue(userJson, User.class);
-
+        User savedUser = null;
         System.out.println(user.getRoles());
+
         if (!file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
             user.setPhotos(fileName);
-            User savedUser = userSer.createdUser(user);
+            savedUser = userSer.createdUser(user);
 
             String uploadDir = "images/user-photo/" + savedUser.getId();
 
@@ -163,10 +165,15 @@ public class UserController {
 
         } else {
             if (user.getPhotos().isEmpty()) user.setPhotos(null);
-            userSer.createdUser(user);
+            savedUser = userSer.createdUser(user);
         }
 
-        return new ResponseEntity<>(user ,HttpStatus.OK);
+        Set<Role> list = savedUser.getRoles();
+        for (Role r : list) {
+            System.out.println(r.getId() +" " + r.getName());
+        }
+
+        return new ResponseEntity<>(savedUser ,HttpStatus.OK);
     }
 
     // Get user information for edit form for USER , need code DTO for send Object json

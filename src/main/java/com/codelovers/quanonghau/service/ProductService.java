@@ -2,6 +2,7 @@ package com.codelovers.quanonghau.service;
 
 import com.codelovers.quanonghau.entity.Product;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface ProductService {
     void deleteProductById(Integer id) throws ProductNotFoundException;
 
     Product get(Integer id) throws ProductNotFoundException;
+
+    Page<Product> listByPage(int pageNum, String sortField, String sortDir, String keyword);
 }

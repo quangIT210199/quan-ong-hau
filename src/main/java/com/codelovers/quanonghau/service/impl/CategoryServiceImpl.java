@@ -27,7 +27,6 @@ public class CategoryServiceImpl implements CategoryService {
         return listHierarchicalCategories(rootCategories);
     }
 
-
     private List<Category> listHierarchicalCategories(List<Category> rootCategories) {
         List<Category> hierarchicalCategories = new ArrayList<>();
 
@@ -110,6 +109,15 @@ public class CategoryServiceImpl implements CategoryService {
     // Get Info for Form
     @Override
     public Category saveCategory(Category category) {
+        Category parent = category.getParent();
+
+        if (parent != null) {
+            String allParentIds = parent.getAllParentIDs() == null ? "-" : parent.getAllParentIDs();
+            allParentIds += String.valueOf(parent.getId()) + "-";
+
+            category.setAllParentIDs(allParentIds);
+        }
+
         return categoryRepo.save(category);
     }
 
@@ -159,7 +167,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategoryById(Integer id) throws CategoryNotFoundException {
-        Long count = categoryRepo.count();
+        Long count = categoryRepo.countById(id);
 
         if(count == null || count == 0) {
             throw new CategoryNotFoundException("Counld not found category with ID: " + id);

@@ -73,9 +73,28 @@ public class Product implements Serializable{
         this.details.add(new ProductDetails(name, value, this));
     }
 
-    // Extra Image
+    public void addDetails(Integer id, String name, String value) {
+        this.details.add((new ProductDetails(id, name, value, this)));
+    }
+
+    // Extra Image to Set Collection
     public void addExtraImage(String imageName) {
         this.images.add(new ProductImage(imageName, this));
+    }
+
+    // Check the ExtraImage in Set Collection
+    public boolean containsImageName(String imageName) {
+        Iterator<ProductImage> iterator = images.iterator();
+
+        while (iterator.hasNext()) {
+            ProductImage image = iterator.next();
+
+            if (image.getName().equals(imageName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Transient

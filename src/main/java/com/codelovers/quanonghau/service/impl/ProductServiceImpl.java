@@ -1,10 +1,15 @@
 package com.codelovers.quanonghau.service.impl;
 
+import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.entity.Product;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
 import com.codelovers.quanonghau.repository.ProductRepository;
 import com.codelovers.quanonghau.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,6 +31,21 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> listAll() {
         return (List<Product>) productRepo.findAll();
+    }
+
+    @Override
+    public Page<Product> listByPage(int pageNum, String sortField, String sortDir, String keyword) {
+        Sort sort = Sort.by(sortField);
+
+        sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
+
+        Pageable pageable = PageRequest.of(pageNum - 1, Contrants.PRODUCT_PER_PAGE, sort);
+
+        if (keyword == null) { // Search by filter
+            return productRepo.findAll(keyword, pageable);
+        }
+
+        return productRepo.findAll(pageable);
     }
 
     @Override
@@ -56,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProductById(Integer id) throws ProductNotFoundException {
-        Long count = productRepo.count();
+        Long count = productRepo.countById(id);
 
         if(count == 0 || count == null) {
             throw new ProductNotFoundException("Counld not found product with id: " + id);

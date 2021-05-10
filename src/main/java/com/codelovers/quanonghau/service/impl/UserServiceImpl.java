@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
         return userRepo.getUserByEmail(email);
     }
 
-    @Override
+    @Override // Chua dc su dung
     public User getCurrentlyLoggedInUser(Authentication authentication){
         if(authentication == null)
             return null;

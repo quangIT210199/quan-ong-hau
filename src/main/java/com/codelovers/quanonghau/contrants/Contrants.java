@@ -7,4 +7,6 @@ public class Contrants {
     public static final String TOKEN ="token";
 
     public static final int USERS_PER_PAGE = 5;
+
+    public static final int PRODUCT_PER_PAGE = 10;
 }

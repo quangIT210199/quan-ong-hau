@@ -1,7 +1,8 @@
 package com.codelovers.quanonghau.repository;
 
 import com.codelovers.quanonghau.entity.Product;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -15,4 +16,12 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, I
     @Query("UPDATE Product p SET p.enabled =?2 WHERE p.id =?1")
     @Modifying
     void updateProductEnabledStatus(Integer id, boolean enabled);
+
+    Long countById(Integer id);
+
+    @Query("SELECT p FROM Product p WHERE p.name LIKE %?1% "
+            + "OR p.shortDescription LIKE %?1% "
+            + "OR p.fullDescription LIKE %?1% "
+            + "OR p.category.name LIKE %?1% ")
+    Page<Product> findAll(String keyword, Pageable pageable);
 }

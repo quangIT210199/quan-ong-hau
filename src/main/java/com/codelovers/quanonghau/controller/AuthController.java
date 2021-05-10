@@ -69,7 +69,7 @@ public class AuthController {
                 customUserDetails.getUser().getId(), customUserDetails.getUsername(), roles), HttpStatus.OK);
     }
 
-    //For User
+    //For User, need code @Valid
     @PostMapping(value ="/signup", produces = "application/json")
     public ResponseEntity<?> registerUser(@Validated @RequestBody SignupRequest signupRequest){
 

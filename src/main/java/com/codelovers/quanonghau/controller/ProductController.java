@@ -1,16 +1,21 @@
 package com.codelovers.quanonghau.controller;
 
+import com.codelovers.quanonghau.contrants.Contrants;
+import com.codelovers.quanonghau.controller.output.PagingProduct;
 import com.codelovers.quanonghau.dto.EditProductDTO;
 import com.codelovers.quanonghau.dto.NewProductDTO;
 import com.codelovers.quanonghau.entity.Category;
 import com.codelovers.quanonghau.entity.Product;
+import com.codelovers.quanonghau.entity.ProductImage;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
+import com.codelovers.quanonghau.help.ProductSaveHelper;
 import com.codelovers.quanonghau.service.CategoryService;
 import com.codelovers.quanonghau.service.ProductService;
 import com.codelovers.quanonghau.util.FileUploadUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +24,14 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/products")
@@ -33,9 +44,47 @@ public class ProductController {
     private CategoryService categorySer;
 
     @GetMapping(value = "/products", produces = "application/json")
-    public ResponseEntity<?> getAllProdut() {
+    public ResponseEntity<?> listAllProdut() {
 
         return new ResponseEntity<>(productSer.listAll(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/product/firstPage", produces = "application/json")
+    public ResponseEntity<?> listFirstPage() {
+        return listProduct(1, "name", "ase", null);
+    }
+
+    @GetMapping(value = "/product/page", produces = "application/json")
+    public ResponseEntity<?> listProduct(@RequestParam(value = "pageNum") Integer pageNum,
+                                          @RequestParam(value = "sortField") String sortField,
+                                          @RequestParam(value = "sortDir") String sortDir,
+                                          @RequestParam(value = "keyword") String keyword) {
+        Page<Product> page = productSer.listByPage(pageNum, sortField, sortDir, keyword);
+
+        List<Product> listProduct = page.getContent();
+        long startCount = (pageNum -1) * Contrants.PRODUCT_PER_PAGE + 1; // Start at index element
+        long endCount = startCount + Contrants.PRODUCT_PER_PAGE - 1; // Index of End element
+
+        if (endCount > page.getTotalElements()) { // The last page
+            endCount = page.getTotalElements();
+        }
+
+        String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc";
+
+        PagingProduct pagingProduct = new PagingProduct();
+
+        pagingProduct.setProductList(listProduct);
+        pagingProduct.setCurrentPage(pageNum);
+        pagingProduct.setTotalPage(page.getTotalPages());
+        pagingProduct.setStartCount(startCount);
+        pagingProduct.setEndCount(endCount);
+        pagingProduct.setTotalItems(page.getTotalElements());
+        pagingProduct.setSortField(sortField);
+        pagingProduct.setSortDir(sortDir);
+        pagingProduct.setKeyword(keyword);
+        pagingProduct.setReverseSortDir(reverseSortDir);
+
+        return new ResponseEntity<>(pagingProduct, HttpStatus.OK);
     }
 
     // Need code DTO for return json use for Form Product
@@ -49,89 +98,33 @@ public class ProductController {
         return new ResponseEntity<>(newProductDTO, HttpStatus.OK);
     }
 
+    // Cần tách ra làm 2 API
     @PostMapping(value = "/product/save", produces = "application/json")
     public ResponseEntity<?> saveProduct(String productJson,
                                          @RequestParam(value = "fileImage", required = false) MultipartFile mainImage,
                                          @RequestParam(value = "extraImage", required = false) MultipartFile[] extraImage,
+                                         @RequestParam(value = "detailIDs", required = false) String [] detailIDs,
                                          @RequestParam(value = "detailNames", required = false) String[] detailNames,
                                          @RequestParam(value = "detailValues", required = false) String[] detailValues,
-                                         @RequestParam(value = "imageIDs", required = false) Integer[] imageIDs,
+                                         @RequestParam(value = "imageIDs", required = false) String[] imageIDs,
                                          @RequestParam(value = "imageNames", required = false) String[] imageNames) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         Product product = mapper.readValue(productJson, Product.class);
 
-        setExtraImageNames(extraImage, product);
+        ProductSaveHelper.setMainImageName(mainImage, product);
 
-        setExistingExtraImageNames(imageIDs, imageNames, product); // Set image for Extra Image already have in server
+        ProductSaveHelper.setExistingExtraImageNames(imageIDs, imageNames, product); // Set image for Extra Image already have in server
 
-        setMainImageName(mainImage, product);
-        setProductDetails(detailNames, detailValues, product);
+        ProductSaveHelper.setNewExtraImageNames(extraImage, product); // Set newExtraImage to the Set collection
+        ProductSaveHelper.setProductDetails(detailIDs, detailNames, detailValues, product);
 
         Product savedProduct = productSer.saveProduct(product);
 
-        saveUploadImages(mainImage, extraImage, savedProduct);
+        ProductSaveHelper.saveUploadImages(mainImage, extraImage, savedProduct);
 
-        return new ResponseEntity(product, HttpStatus.OK);
-    }
+        ProductSaveHelper.deleteExtraImagesWereRemovedOnForm(product);
 
-    private void setExistingExtraImageNames(Integer[] imageIDs, String[] imageNames, Product product) {
-        if (imageIDs == null || imageIDs.length == 0) return;
-
-        for (int count = 0; count < imageIDs.length; count++) {
-//            String
-        }
-    }
-
-    private void setProductDetails(String[] detailNames, String[] detailValues, Product product) {
-        if (detailNames == null || detailNames.length == 0) return;
-
-        for (int count = 0; count < detailNames.length; count++) {
-            String name = detailNames[count];
-            String value = detailValues[count];
-
-            if(!name.isEmpty() && !value.isEmpty()) {
-                product.addDetails(name, value);
-            }
-        }
-    }
-
-    private void saveUploadImages(MultipartFile mainImage, MultipartFile[] extraImage, Product savedProduct) throws IOException {
-        if (!mainImage.isEmpty()) {
-            String fileName = StringUtils.cleanPath(mainImage.getOriginalFilename());
-            String uploadDir = "images/product-photo/" + savedProduct.getId();
-
-            FileUploadUtil.cleanDir(uploadDir);
-            FileUploadUtil.saveFile(uploadDir, fileName, mainImage);
-        }
-
-        if (extraImage.length > 0) {
-            String uploadDir = "images/product-photo/" + savedProduct.getId() +"/extras/";
-
-            for (MultipartFile multipartFile : extraImage) {
-                if (mainImage.isEmpty()) continue;
-
-                String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-                FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-            }
-        }
-    }
-
-    private void setExtraImageNames(MultipartFile[] extraImageFilles, Product product) {
-        if(extraImageFilles.length > 0) {
-            for (MultipartFile multipartFile : extraImageFilles) {
-                if (!multipartFile.isEmpty()) {
-                    String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-                    product.addExtraImage(fileName);
-                }
-            }
-        }
-    }
-
-    private void setMainImageName(MultipartFile mainImageFile, Product product) {
-        if (!mainImageFile.isEmpty()) {
-            String fileName = StringUtils.cleanPath(mainImageFile.getOriginalFilename());
-            product.setMainImage(fileName);
-        }
+        return new ResponseEntity(savedProduct, HttpStatus.OK);
     }
 
     @GetMapping(value = "/product/edit" , produces = "application/json")

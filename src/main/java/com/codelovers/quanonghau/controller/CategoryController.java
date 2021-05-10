@@ -18,13 +18,20 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/categories")
 public class CategoryController {
 
     @Autowired
     CategoryService categorySer;
 
-    @GetMapping(value = "/categories", produces = "application/json")
+    // For test
+    @GetMapping(value = "/category/{id}", produces = "application/json")
+    public ResponseEntity<?> getCateById(@PathVariable(name = "id") Integer id) {
+
+        return new ResponseEntity<>(categorySer.findCategoryById(id), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/category", produces = "application/json")
     public ResponseEntity<?> listAll(){
         List<Category> listCate = categorySer.listAll();
 
@@ -32,19 +39,18 @@ public class CategoryController {
     }
 
     // This API using when open form to create or update
-    @GetMapping(value = "/categories/new", produces = "application/json")
+    @GetMapping(value = "/category/new", produces = "application/json")
     public ResponseEntity<?> newCategory(){
         List<Category> listCate = categorySer.listCategoryUsedInForm();
 
         return new ResponseEntity<>(listCate, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/categories/save",consumes = "multipart/form-data",produces = "application/json")
+    // Cần tách ra làm 2 API
+    @PostMapping(value = "/category/save",consumes = "multipart/form-data",produces = "application/json")
     public ResponseEntity<?> saveCategory(String categoryJson, @RequestParam("imageFile")MultipartFile file) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         Category category = mapper.readValue(categoryJson, Category.class);
-
-        System.out.println(category.getName());
 
         if(!file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
@@ -63,7 +69,7 @@ public class CategoryController {
         return new ResponseEntity<>(category,HttpStatus.OK);
     }
 
-    @GetMapping(value = "/categories/edit", produces = "application/json")
+    @GetMapping(value = "/category/edit", produces = "application/json")
     public ResponseEntity<CategoryDTO> editCategory(@RequestParam(value = "id") Integer id) {
         Category category = categorySer.findCategoryById(id);
 
@@ -80,7 +86,7 @@ public class CategoryController {
         return new ResponseEntity<CategoryDTO>(categoryDTO,HttpStatus.OK);
     }
 
-    @PostMapping(value = "categories/check_unique", produces = "application/json")
+    @PostMapping(value = "/category/check_unique", produces = "application/json")
     public ResponseEntity<?> checkUniqueCategories(@Param(value = "id") Integer id, @Param(value = "name") String name,
                                                    @Param(value = "alias") String alias){
         String result = categorySer.checkUnique(id, name, alias);
@@ -88,7 +94,7 @@ public class CategoryController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/categories/{id}/enabled/{status}", produces = "application/json")
+    @GetMapping(value = "/category/{id}/enabled/{status}", produces = "application/json")
     public ResponseEntity<?> updateCategoryEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled) {
         Category category = categorySer.findCategoryById(id);
         if(category == null) {
@@ -101,7 +107,7 @@ public class CategoryController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/categories/delete/{id}")
+    @GetMapping(value = "/category/delete/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable(name = "id") Integer id) throws CategoryNotFoundException {
         try {
             categorySer.deleteCategoryById(id);
