@@ -34,15 +34,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<Product> listByPage(int pageNum, String sortField, String sortDir, String keyword) {
+    public Page<Product> listByPage(int pageNum, String sortField, String sortDir,
+                                    String keyword, Integer categoryId) {
         Sort sort = Sort.by(sortField);
 
         sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
 
         Pageable pageable = PageRequest.of(pageNum - 1, Contrants.PRODUCT_PER_PAGE, sort);
 
-        if (keyword == null) { // Search by filter
+        if (keyword != null && !keyword.isEmpty()) { // Search by filter, need check empty
+            if (categoryId != null && categoryId > 0) {
+                String categoryMatch = "-" + categoryId +"-";
+                return productRepo.searchInCategory(categoryId, categoryMatch, keyword, pageable);
+            }
             return productRepo.findAll(keyword, pageable);
+        }
+
+        if (categoryId != null && categoryId > 0) {
+            String categoryMatch = "-" + categoryId +"-";
+            return productRepo.findAllInCategory(categoryId, categoryMatch, pageable);
         }
 
         return productRepo.findAll(pageable);

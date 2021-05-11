@@ -53,6 +53,7 @@ public class Product implements Serializable{
     private String mainImage;
 
     // orphanRemoval: Mối đối tượng company sẽ chứa 1 tập hợp các đối tượng employee, khi một đối tượng employee bị xóa khỏi tập hợp đó thì nó sẽ bị xóa khỏi database.
+    // CascadeType.ALL: bất cứ sự thay đổi với parent(Product) sẽ update chile(ProductImage)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductImage> images = new HashSet<>();
 

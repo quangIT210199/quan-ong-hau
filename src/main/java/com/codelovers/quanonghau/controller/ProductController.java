@@ -51,16 +51,20 @@ public class ProductController {
 
     @GetMapping(value = "/product/firstPage", produces = "application/json")
     public ResponseEntity<?> listFirstPage() {
-        return listProduct(1, "name", "ase", null);
+        return listProduct(1, "name", "ase", null, 0); // 0 is mean ALL Category
     }
 
     @GetMapping(value = "/product/page", produces = "application/json")
     public ResponseEntity<?> listProduct(@RequestParam(value = "pageNum") Integer pageNum,
                                           @RequestParam(value = "sortField") String sortField,
                                           @RequestParam(value = "sortDir") String sortDir,
-                                          @RequestParam(value = "keyword") String keyword) {
-        Page<Product> page = productSer.listByPage(pageNum, sortField, sortDir, keyword);
+                                          @RequestParam(value = "keyword") String keyword,
+                                         @RequestParam(value = "categoryID") Integer categoryID) {
+        Page<Product> page = productSer.listByPage(pageNum, sortField, sortDir, keyword, categoryID);
+        // Using Search with Product => Get all list categories
+        List<Category> listCategories = categorySer.listCategoryUsedInForm();
 
+        System.out.println("Category is Selected id: " + categoryID);
         List<Product> listProduct = page.getContent();
         long startCount = (pageNum -1) * Contrants.PRODUCT_PER_PAGE + 1; // Start at index element
         long endCount = startCount + Contrants.PRODUCT_PER_PAGE - 1; // Index of End element
@@ -70,12 +74,15 @@ public class ProductController {
         }
 
         String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc";
-
         PagingProduct pagingProduct = new PagingProduct();
+
+        if (categoryID != null) {
+            pagingProduct.setCategoryID(categoryID);
+        }
 
         pagingProduct.setProductList(listProduct);
         pagingProduct.setCurrentPage(pageNum);
-        pagingProduct.setTotalPage(page.getTotalPages());
+        pagingProduct.setTotalPages(page.getTotalPages());
         pagingProduct.setStartCount(startCount);
         pagingProduct.setEndCount(endCount);
         pagingProduct.setTotalItems(page.getTotalElements());
@@ -83,6 +90,7 @@ public class ProductController {
         pagingProduct.setSortDir(sortDir);
         pagingProduct.setKeyword(keyword);
         pagingProduct.setReverseSortDir(reverseSortDir);
+        pagingProduct.setCategoryList(listCategories);
 
         return new ResponseEntity<>(pagingProduct, HttpStatus.OK);
     }

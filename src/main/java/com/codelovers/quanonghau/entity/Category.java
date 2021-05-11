@@ -49,11 +49,14 @@ public class Category implements Serializable {
     private Set<Category> children = new HashSet<>();
 
     @Transient
-    public String getImagePath() {
+    private String getImagePath() {
         if (id == null || image == null) return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/category-photo/default-user.png").toUriString();
 
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/category-photo/" + this.id + "/" + this.image).toUriString();
     }
+
+    @Transient
+    private boolean hasChildren;
 
     // Tạo subCate
     public static Category copyIdAndName(Category category) {
@@ -114,6 +117,14 @@ public class Category implements Serializable {
     }
 
     public Category() {
+    }
+
+    public boolean isHasChildren() {
+        return hasChildren;
+    }
+
+    public void setHasChildren(boolean hasChildren) {
+        this.hasChildren = hasChildren;
     }
 
     public String getAllParentIDs() {

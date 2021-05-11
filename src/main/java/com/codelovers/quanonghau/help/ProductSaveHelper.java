@@ -57,7 +57,7 @@ public class ProductSaveHelper {
 
         for (int count = 0; count < detailNames.length; count++) {
 
-            if (detailIDs != null) {
+            if (detailIDs != null) { // == Why detailsIDs.length() >0 not work
                 id = Integer.parseInt(detailIDs[count]);
             }
 
