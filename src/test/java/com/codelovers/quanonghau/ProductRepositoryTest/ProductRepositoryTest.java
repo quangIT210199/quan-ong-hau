@@ -92,7 +92,7 @@ public class ProductRepositoryTest {
     @Test
     public void testSaveProductWithImages() {
         Integer productId = 1;
-        Product product =productRepo.findById(productId).get();
+        Product product = productRepo.findById(productId).get();
 
         product.setMainImage("main image.jpg");
         product.addExtraImage("extra image 1.png");

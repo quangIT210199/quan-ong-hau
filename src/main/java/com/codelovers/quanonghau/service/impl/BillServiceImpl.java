@@ -50,12 +50,12 @@ public class BillServiceImpl implements BillService {
     @Override
     public List<Bill> findAllBillByUserId(Integer userId) { // chưa xong
         User u = userRepo.findById(userId).orElse(null);
-        if(u == null){
+        if (u == null) {
             return null;
         }
         // Get list billIds
         Set<Integer> listBillId = cartItemRepo.findBillsByUserId(userId);
-        if(listBillId == null)
+        if (listBillId == null)
             return null;
 
         // Get List Bill
@@ -64,7 +64,7 @@ public class BillServiceImpl implements BillService {
             Bill b = billRepo.findById(id).orElse(null);
             listBill.add(b);
         }
-        
+
         return listBill;
     }
 }

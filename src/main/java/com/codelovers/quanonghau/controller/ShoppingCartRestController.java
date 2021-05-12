@@ -31,9 +31,9 @@ public class ShoppingCartRestController {
     // Show shopping Cart
 //    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     @GetMapping(value = "/cart", produces = "application/json")
-    public ResponseEntity<?> showShoppingCart( @AuthenticationPrincipal CustomUserDetails customUserDetails){
+    public ResponseEntity<?> showShoppingCart(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        if(customUserDetails == null){
+        if (customUserDetails == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         // Need to code authen for get user instance
@@ -43,7 +43,7 @@ public class ShoppingCartRestController {
 
         List<CartItem> cartItems = cartItemSer.listCartItems(user);
 
-        if(cartItems.isEmpty()){
+        if (cartItems.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(cartItems, HttpStatus.OK);
@@ -52,19 +52,19 @@ public class ShoppingCartRestController {
     // Fix code, beacase value uid dont need when code authen
     @GetMapping(value = "/cart/add/{pid}/{qty}", produces = "application/json")
     public ResponseEntity<?> addProductToCart(@PathVariable(name = "pid") Integer pid,
-                                              @PathVariable(name = "qty") Integer qty, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+                                              @PathVariable(name = "qty") Integer qty, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 //        if(authentication == null || authentication instanceof AnonymousAuthenticationToken){
 //            System.out.println("Null?");
 //            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 //        }
-        if(customUserDetails == null){
+        if (customUserDetails == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         User user = customUserDetails.getUser();
 
         Product product = productSer.findById(pid);
-        if(product == null){
+        if (product == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
@@ -77,21 +77,21 @@ public class ShoppingCartRestController {
     // Calculator when click button
     @PostMapping(value = "/cart/update/{pid}/{qty}", produces = "application/json")
     public ResponseEntity<?> updateQuantity(@PathVariable(name = "pid") Integer pid,
-                                            @PathVariable(name = "qty") Integer qty, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+                                            @PathVariable(name = "qty") Integer qty, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         // Can check billID co ko. Co thi k dc tang quantity
-        if(customUserDetails == null){
+        if (customUserDetails == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         User user = customUserDetails.getUser();
 
         Product product = productSer.findById(pid);
-        if(product == null){
+        if (product == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         CartItem c = cartItemSer.exitBillId(pid, user);
-        if(c == null){ // Product is in Bill
+        if (c == null) { // Product is in Bill
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
@@ -102,16 +102,16 @@ public class ShoppingCartRestController {
 
     // Fix code, beacase value uid dont need when code authen : /cart/update/{pid}
     @DeleteMapping(value = "/cart/remove/{pid}", produces = "application/json")
-    public ResponseEntity<?> removeProductFromCart(@PathVariable(name = "pid") Integer pid, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+    public ResponseEntity<?> removeProductFromCart(@PathVariable(name = "pid") Integer pid, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        if(customUserDetails == null){
+        if (customUserDetails == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         User user = customUserDetails.getUser();
 
         Product product = productSer.findById(pid);
-        if(product == null){
+        if (product == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 

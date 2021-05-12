@@ -40,13 +40,13 @@ public class AccountController {
     public ResponseEntity<?> saveDetail(User user, @RequestParam(name = "imageFile") MultipartFile file,
                                         @AuthenticationPrincipal CustomUserDetails loggerUser) throws IOException {
 
-        if(!file.isEmpty()) {
+        if (!file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
             user.setPhotos(fileName);
             User savedUser = userSer.updateAccount(user);
 
-            String uploadDir = "src/main/resources/static/user-photo/" + savedUser.getId();
+            String uploadDir = "images/user-photo/" + savedUser.getId();
 
             FileUploadUtil.cleanDir(uploadDir);
             FileUploadUtil.saveFile(uploadDir, fileName, file);
@@ -64,12 +64,12 @@ public class AccountController {
 
     @PostMapping(value = "/account/updatePass", produces = "application/json")
     public ResponseEntity<?> updatePassword(@RequestBody UpdatePassword password,
-                                            @AuthenticationPrincipal CustomUserDetails loggerUser){
-        if(!password.getConfirmPass().equals(password.getNewPassword())){
+                                            @AuthenticationPrincipal CustomUserDetails loggerUser) {
+        if (!password.getConfirmPass().equals(password.getNewPassword())) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        if(userSer.checkIfValidOldPassword(loggerUser.getUser(), password.getOldPassword())){
+        if (userSer.checkIfValidOldPassword(loggerUser.getUser(), password.getOldPassword())) {
 
             userSer.changePassword(loggerUser.getUser(), password.getNewPassword());
         }

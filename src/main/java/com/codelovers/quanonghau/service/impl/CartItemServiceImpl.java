@@ -52,11 +52,10 @@ public class CartItemServiceImpl implements CartItemService {
         // Check xem giỏ hàng tồn tại và trạng thái có Bill chưa
         CartItem cartItem = cartItemRepo.findByProductAndUserAndBill(product, user, null);
 
-        if(cartItem != null){ // giỏ hàng tồn tại
+        if (cartItem != null) { // giỏ hàng tồn tại
             addedQuantity = cartItem.getQuantity() + quantity;
             cartItem.setQuantity(addedQuantity);
-        }
-        else{
+        } else {
             cartItem = new CartItem();
             cartItem.setQuantity(quantity);
             cartItem.setProduct(product);
@@ -89,7 +88,7 @@ public class CartItemServiceImpl implements CartItemService {
     public void updateBillId(Integer billId, Integer[] cartIds) {
         System.out.println("Bill id: " + billId);
 
-        for (Integer c : cartIds){
+        for (Integer c : cartIds) {
             cartItemRepo.updateBillId(billId, c);
         }
     }
@@ -97,7 +96,7 @@ public class CartItemServiceImpl implements CartItemService {
     @Override
     public CartItem findByIdAndUser(Integer cartID, Integer userId) {
         CartItem cartItem = cartItemRepo.findById(cartID).get();
-        if(cartItem == null){
+        if (cartItem == null) {
             return null;
         }
         User user = userRepo.findById(userId).get();

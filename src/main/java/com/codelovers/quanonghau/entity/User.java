@@ -20,16 +20,16 @@ public class User implements Serializable {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "first_name",length = 45,nullable = false)
+    @Column(name = "first_name", length = 45, nullable = false)
     private String firstName;
 
     @Column(name = "last_name", length = 45, nullable = false)
     private String lastName;
 
-    @Column(name = "email",length = 128, nullable = false, unique = true)
+    @Column(name = "email", length = 128, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password",length = 64, nullable = false)
+    @Column(name = "password", length = 64, nullable = false)
     private String password;
 
     @Column(name = "photos", length = 64)
@@ -47,11 +47,11 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) // CascadeType.PERSIST: khi thêm sẽ ảnh hưởng tới các modal liên kết
     List<CartItem> cartItems = new ArrayList<>();
 
-//    @JsonIgnore @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    //    @JsonIgnore @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Fetch(FetchMode.JOIN)
     @ManyToMany
     @JoinTable(
-            name ="user_role",
+            name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
@@ -59,12 +59,13 @@ public class User implements Serializable {
 
     @Transient
     public String getFullName() {
-        return firstName +" "+lastName;
+        return firstName + " " + lastName;
     }
 
     @Transient
     public String getPhotosImagePath() {
-        if (id == null || photos == null) return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/user-photo/default-user.png").toUriString();
+        if (id == null || photos == null)
+            return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/user-photo/default-user.png").toUriString();
 
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/user-photo/" + this.id + "/" + this.photos).toUriString();
     }
@@ -74,7 +75,7 @@ public class User implements Serializable {
 
         while (iterator.hasNext()) {
             Role role = iterator.next();
-            if(role.getName().equals(roleName)) {
+            if (role.getName().equals(roleName)) {
                 return true;
             }
         }
@@ -85,7 +86,7 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String email, String password, String firstName,String lastName) {
+    public User(String email, String password, String firstName, String lastName) {
         this.email = email;
         this.password = password;
         this.firstName = firstName;

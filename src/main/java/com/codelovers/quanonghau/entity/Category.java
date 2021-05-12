@@ -50,7 +50,8 @@ public class Category implements Serializable {
 
     @Transient
     private String getImagePath() {
-        if (id == null || image == null) return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/category-photo/default-user.png").toUriString();
+        if (id == null || image == null)
+            return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/category-photo/default-user.png").toUriString();
 
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/category-photo/" + this.id + "/" + this.image).toUriString();
     }
@@ -75,7 +76,7 @@ public class Category implements Serializable {
         return copyCategory;
     }
 
-    public static Category copyFull(Category category){ // Using when save category not have --
+    public static Category copyFull(Category category) { // Using when save category not have --
         Category copyCategory = new Category();
         copyCategory.setId(category.getId());
         copyCategory.setName(category.getName());
@@ -98,6 +99,7 @@ public class Category implements Serializable {
         this(name);
         this.parent = parent;
     }
+
     // Tạo subCate
     public Category(String name) {
         this.name = name;

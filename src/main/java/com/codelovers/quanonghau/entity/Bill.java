@@ -25,7 +25,8 @@ public class Bill implements Serializable {
     @Column(name = "status")
     private String status;
 
-    public Bill(){}
+    public Bill() {
+    }
 
     public Integer getId() {
         return id;

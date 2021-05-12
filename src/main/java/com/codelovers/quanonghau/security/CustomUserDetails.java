@@ -19,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
 
     private User user;
 
-    public CustomUserDetails(User user){
+    public CustomUserDetails(User user) {
         this.user = user;
     }
 
@@ -29,7 +29,7 @@ public class CustomUserDetails implements UserDetails {
         System.out.println("Vao day Custom");
         List<SimpleGrantedAuthority> authories = new ArrayList<>();
 
-        for (Role role : roles){
+        for (Role role : roles) {
             authories.add(new SimpleGrantedAuthority(ROLE + role.getName()));
         }
 
@@ -75,7 +75,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public String getFullName() {
-        return this.user.getFirstName() +" "+ this.user.getLastName();
+        return this.user.getFirstName() + " " + this.user.getLastName();
     }
 
     public void setFirstName(String firstName) {

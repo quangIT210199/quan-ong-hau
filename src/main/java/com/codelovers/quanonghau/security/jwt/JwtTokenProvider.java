@@ -15,7 +15,7 @@ public class JwtTokenProvider {
 
     private final Long JWT_EXPIRATION = 604800000L;
 
-    public String generateToken(CustomUserDetails userDetails){
+    public String generateToken(CustomUserDetails userDetails) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
 
@@ -27,7 +27,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public Integer getUserIdFromJWT(String token){
+    public Integer getUserIdFromJWT(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(JWT_SECRET)
                 .parseClaimsJws(token)
@@ -36,16 +36,16 @@ public class JwtTokenProvider {
         return Integer.parseInt(claims.getSubject());
     }
 
-    public boolean validateToken(String authToken){
+    public boolean validateToken(String authToken) {
         try {
             // Check token
             Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(authToken);
             return true;
-        } catch (SignatureException ex){
+        } catch (SignatureException ex) {
             log.error("Invalid JWT signature", ex);
-        } catch (MalformedJwtException ex){
+        } catch (MalformedJwtException ex) {
             log.error("Invalid JWT token", ex);
-        } catch (ExpiredJwtException ex){
+        } catch (ExpiredJwtException ex) {
             log.error("JWT token is expiryTime", ex);
         } catch (UnsupportedJwtException ex) {
             log.error("Unsupported JWT token", ex);

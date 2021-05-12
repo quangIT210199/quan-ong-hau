@@ -44,14 +44,14 @@ public class ProductServiceImpl implements ProductService {
 
         if (keyword != null && !keyword.isEmpty()) { // Search by filter, need check empty
             if (categoryId != null && categoryId > 0) {
-                String categoryMatch = "-" + categoryId +"-";
+                String categoryMatch = "-" + categoryId + "-";
                 return productRepo.searchInCategory(categoryId, categoryMatch, keyword, pageable);
             }
             return productRepo.findAll(keyword, pageable);
         }
 
         if (categoryId != null && categoryId > 0) {
-            String categoryMatch = "-" + categoryId +"-";
+            String categoryMatch = "-" + categoryId + "-";
             return productRepo.findAllInCategory(categoryId, categoryMatch, pageable);
         }
 
@@ -88,7 +88,7 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProductById(Integer id) throws ProductNotFoundException {
         Long count = productRepo.countById(id);
 
-        if(count == 0 || count == null) {
+        if (count == 0 || count == null) {
             throw new ProductNotFoundException("Counld not found product with id: " + id);
         }
 

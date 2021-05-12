@@ -30,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Transactional
-    public UserDetails loadUserById(Integer id){ // used for JWT filter
+    public UserDetails loadUserById(Integer id) { // used for JWT filter
         User user = userRepo.findById(id).orElseThrow(
                 () -> new UsernameNotFoundException("User not found with id : " + id)
         );

@@ -9,30 +9,30 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-public class FileUploadUtil { // K dùng nữa, vì k lưu local
+public class FileUploadUtil { // Need Refactor thist class for download Resource
 
     public static void saveFile(String uploadDir, String fileName,
                                 MultipartFile multipartFile) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
 
-        if( !Files.exists(uploadPath)){
+        if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        try(InputStream inputStream = multipartFile.getInputStream()){
+        try (InputStream inputStream = multipartFile.getInputStream()) {
             Path filePath = uploadPath.resolve(fileName);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-        }catch (IOException ex){
+        } catch (IOException ex) {
             throw new IOException("Could not save file: " + fileName, ex);
         }
     }
 
-    public static void cleanDir(String dir){
+    public static void cleanDir(String dir) {
         Path dirPath = Paths.get(dir);
 
         try {
             Files.list(dirPath).forEach(file -> {
-                if(!Files.isDirectory(file)){
+                if (!Files.isDirectory(file)) {
                     try {
                         Files.delete(file);
                     } catch (IOException e) {
@@ -40,12 +40,12 @@ public class FileUploadUtil { // K dùng nữa, vì k lưu local
                     }
                 }
             });
-        }catch (IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    public static void removeDir(String dir)  {
+    public static void removeDir(String dir) {
         cleanDir(dir);
 
         try {

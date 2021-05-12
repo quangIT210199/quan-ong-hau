@@ -43,14 +43,14 @@ public class AuthController {
     private RoleService roleSer;
 
     @PostMapping(value = "/login", produces = "application/json")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         // Validate username and password using spring authenticate
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                    loginRequest.getEmail(),
-                    loginRequest.getPassword()
-            )
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
         );
 
         // If dont have exception -> set information to Spring Security Context
@@ -70,10 +70,10 @@ public class AuthController {
     }
 
     //For User, need code @Valid
-    @PostMapping(value ="/signup", produces = "application/json")
-    public ResponseEntity<?> registerUser(@Validated @RequestBody SignupRequest signupRequest){
+    @PostMapping(value = "/signup", produces = "application/json")
+    public ResponseEntity<?> registerUser(@Validated @RequestBody SignupRequest signupRequest) {
 
-        if(userSer.exitUserByEmail(signupRequest.getEmail())){
+        if (userSer.exitUserByEmail(signupRequest.getEmail())) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 

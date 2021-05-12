@@ -3,17 +3,22 @@ package com.codelovers.quanonghau.service;
 import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
+
+import java.util.List;
 
 public interface UserService {
 
     User findById(Integer id);
 
+    List<User> listAll();
+
     User getUserByEmail(String email);
 
     User getCurrentlyLoggedInUser(Authentication authentication);
 
-    boolean isEmailUnique(Integer id,String email);
+    boolean isEmailUnique(Integer id, String email);
 
     boolean exitUserByEmail(String email);
 

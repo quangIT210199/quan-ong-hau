@@ -1,4 +1,4 @@
-package com.codelovers.quanonghau.controller;
+package com.codelovers.quanonghau.controller.admin;
 
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.controller.output.PagingCategories;
@@ -35,7 +35,7 @@ public class CategoryController {
     }
 
     @GetMapping(value = "/category", produces = "application/json")
-    public ResponseEntity<?> listAll(){
+    public ResponseEntity<?> listAll() {
         List<Category> listCate = categorySer.listAll();
 
         return new ResponseEntity<>(listCate, HttpStatus.OK);
@@ -85,19 +85,19 @@ public class CategoryController {
 
     // This API using when open form to create or update
     @GetMapping(value = "/category/new", produces = "application/json")
-    public ResponseEntity<?> newCategory(){
+    public ResponseEntity<?> newCategory() {
         List<Category> listCate = categorySer.listCategoryUsedInForm();
 
         return new ResponseEntity<>(listCate, HttpStatus.OK);
     }
 
     // Cần tách ra làm 2 API
-    @PostMapping(value = "/category/save",consumes = "multipart/form-data",produces = "application/json")
-    public ResponseEntity<?> saveCategory(String categoryJson, @RequestParam("imageFile")MultipartFile file) throws IOException {
+    @PostMapping(value = "/category/save", consumes = "multipart/form-data", produces = "application/json")
+    public ResponseEntity<?> saveCategory(String categoryJson, @RequestParam("imageFile") MultipartFile file) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         Category category = mapper.readValue(categoryJson, Category.class);
 
-        if(!file.isEmpty()) {
+        if (!file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
             category.setImage(fileName);
 
@@ -106,19 +106,18 @@ public class CategoryController {
 
             FileUploadUtil.cleanDir(uploadDir);
             FileUploadUtil.saveFile(uploadDir, fileName, file);
-        }
-        else {
+        } else {
             categorySer.saveCategory(category);
         }
 
-        return new ResponseEntity<>(category,HttpStatus.OK);
+        return new ResponseEntity<>(category, HttpStatus.OK);
     }
 
     @GetMapping(value = "/category/edit", produces = "application/json")
     public ResponseEntity<CategoryDTO> editCategory(@RequestParam(value = "id") Integer id) {
         Category category = categorySer.findCategoryById(id);
 
-        if(category == null)
+        if (category == null)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
         List<Category> listCategory = categorySer.listCategoryUsedInForm();
@@ -128,12 +127,12 @@ public class CategoryController {
         categoryDTO.setCategory(category);
         categoryDTO.setListCategory(listCategory);
 
-        return new ResponseEntity<CategoryDTO>(categoryDTO,HttpStatus.OK);
+        return new ResponseEntity<CategoryDTO>(categoryDTO, HttpStatus.OK);
     }
 
     @PostMapping(value = "/category/check_unique", produces = "application/json")
     public ResponseEntity<?> checkUniqueCategories(@Param(value = "id") Integer id, @Param(value = "name") String name,
-                                                   @Param(value = "alias") String alias){
+                                                   @Param(value = "alias") String alias) {
         String result = categorySer.checkUnique(id, name, alias);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -142,7 +141,7 @@ public class CategoryController {
     @GetMapping(value = "/category/{id}/enabled/{status}", produces = "application/json")
     public ResponseEntity<?> updateCategoryEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled) {
         Category category = categorySer.findCategoryById(id);
-        if(category == null) {
+        if (category == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
@@ -159,9 +158,9 @@ public class CategoryController {
             String categoryDir = "images/category-photo/" + id;
 
             FileUploadUtil.removeDir(categoryDir);
-            return new ResponseEntity<>("Delete done" + id,HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>("Delete done" + id, HttpStatus.NO_CONTENT);
         } catch (CategoryNotFoundException ex) {
-            return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 }

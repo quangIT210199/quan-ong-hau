@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -35,19 +36,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> listAll() { // For PDF
+        return (List<User>) userRepo.findAll(Sort.by("firstName").ascending());
+    }
+
+    @Override
     public User getUserByEmail(String email) {
         return userRepo.getUserByEmail(email);
     }
 
     @Override // Chua dc su dung
-    public User getCurrentlyLoggedInUser(Authentication authentication){
-        if(authentication == null)
+    public User getCurrentlyLoggedInUser(Authentication authentication) {
+        if (authentication == null)
             return null;
 
         User user = null;
         Object principal = authentication.getPrincipal();
 
-        if(principal instanceof CustomUserDetails){
+        if (principal instanceof CustomUserDetails) {
             user = ((CustomUserDetails) principal).getUser();
         }
 
@@ -73,7 +79,7 @@ public class UserServiceImpl implements UserService {
 
         passwordEncoder = new BCryptPasswordEncoder();
 
-        if(passwordEncoder.matches(oldPassword, user.getPassword())) {
+        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
             return true;
         }
 
@@ -90,15 +96,14 @@ public class UserServiceImpl implements UserService {
     public boolean isEmailUnique(Integer id, String email) { // Use for update User
         User userByEmail = userRepo.getUserByEmail(email);
 
-        if(userByEmail == null) return true;
+        if (userByEmail == null) return true;
 
         boolean isCreatingNew = (id == null);
 
-        if(isCreatingNew) {
+        if (isCreatingNew) {
             if (userByEmail != null) return false;
-        }
-        else {
-            if(userByEmail.getId() != id){
+        } else {
+            if (userByEmail.getId() != id) {
                 return false;
             }
         }
@@ -135,12 +140,12 @@ public class UserServiceImpl implements UserService {
     public User updateAccount(User userInForm) {
         User userInDB = userRepo.findById(userInForm.getId()).get();
 
-        if(!userInForm.getPassword().isEmpty()) {
+        if (!userInForm.getPassword().isEmpty()) {
             userInDB.setPassword(userInForm.getPassword());
             encodePassword(userInDB);
         }
 
-        if(userInForm.getPhotos() != null) {
+        if (userInForm.getPhotos() != null) {
             userInDB.setPhotos(userInForm.getPhotos());
         }
 
@@ -159,7 +164,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Integer id) throws UserNotFoundException {
         Long countById = userRepo.countById(id);
 
-        if(countById == null || countById == 0){
+        if (countById == null || countById == 0) {
             throw new UserNotFoundException("Could not find user with id: " + id);
         }
 

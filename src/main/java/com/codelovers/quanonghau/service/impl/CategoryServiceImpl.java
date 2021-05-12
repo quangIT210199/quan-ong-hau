@@ -25,7 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> listAll() { // This using for Test :v
-       List<Category> rootCategories =  categoryRepo.findRootCategories(Sort.by("name").ascending());
+        List<Category> rootCategories = categoryRepo.findRootCategories(Sort.by("name").ascending());
 
         return listHierarchicalCategories(rootCategories, "asc");
     }
@@ -93,9 +93,9 @@ public class CategoryServiceImpl implements CategoryService {
         int newSublevel = sublevel + 1;
 
         for (Category subCategory : children) {
-            String name ="";
+            String name = "";
 
-            for (int i=0; i< newSublevel; i++) {
+            for (int i = 0; i < newSublevel; i++) {
                 name += "--";
             }
 
@@ -116,8 +116,7 @@ public class CategoryServiceImpl implements CategoryService {
             public int compare(Category cat1, Category cat2) {
                 if (sortDir.equals("asc")) {
                     return cat1.getName().compareTo(cat2.getName());
-                }
-                else {
+                } else {
                     return cat2.getName().compareTo(cat1.getName());
                 }
             }
@@ -137,13 +136,13 @@ public class CategoryServiceImpl implements CategoryService {
         Iterable<Category> categoriesDB = categoryRepo.findRootCategories(Sort.by("name").ascending());
 
         for (Category category : categoriesDB) {
-            if(category.getParent() == null) {
+            if (category.getParent() == null) {
                 //Get Id and Name
                 categoriesUsedInForm.add(Category.copyIdAndName(category));
                 // Need Sort children Set
                 Set<Category> children = sortSubCategories(category.getChildren());
 
-                for(Category subCategory : children) {
+                for (Category subCategory : children) {
                     String name = "--" + subCategory.getName();
                     categoriesUsedInForm.add(Category.copyIdAndName(subCategory.getId(), name));
 
@@ -163,8 +162,8 @@ public class CategoryServiceImpl implements CategoryService {
         Set<Category> children = sortSubCategories(parent.getChildren());
 
         for (Category subCategory : children) {
-            String name ="";
-            for (int i = 0 ; i < newSublevel; i++) {
+            String name = "";
+            for (int i = 0; i < newSublevel; i++) {
                 name += "--";
             }
 
@@ -173,6 +172,7 @@ public class CategoryServiceImpl implements CategoryService {
             listSubCategoriesUsedInForm(categoriesUsedInForm, subCategory, sublevel);
         }
     }
+
     // Get Info for Form
     @Override
     public Category saveCategory(Category category) {
@@ -201,24 +201,21 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category categoryByName = categoryRepo.findByName(name);
 
-        if(isCreatingNew) {
+        if (isCreatingNew) {
             if (categoryByName != null) {
                 return "Duplicate Name";
-            }
-            else {
+            } else {
                 Category categoryByAlais = categoryRepo.findByAlias(alais);
-                if(categoryByAlais != null) {
+                if (categoryByAlais != null) {
                     return "Duplicate Alias";
                 }
             }
-        }
-        else {
+        } else {
             if (categoryByName != null && categoryByName.getId() != id) {
                 return "Duplicate Name";
-            }
-            else {
+            } else {
                 Category categoryByAlais = categoryRepo.findByAlias(alais);
-                if(categoryByAlais != null && categoryByAlais.getId() != id) {
+                if (categoryByAlais != null && categoryByAlais.getId() != id) {
                     return "Duplicate Alias";
                 }
             }
@@ -236,7 +233,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategoryById(Integer id) throws CategoryNotFoundException {
         Long count = categoryRepo.countById(id);
 
-        if(count == null || count == 0) {
+        if (count == null || count == 0) {
             throw new CategoryNotFoundException("Counld not found category with ID: " + id);
         }
 

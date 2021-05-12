@@ -70,7 +70,7 @@ public class CategoryTest {
 
         for (Category category : categories) {
 
-            if(category.getParent() == null) { // root
+            if (category.getParent() == null) { // root
                 System.out.println(category.getName());
                 // get child
                 Set<Category> child = category.getChildren();

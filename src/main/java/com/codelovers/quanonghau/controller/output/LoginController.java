@@ -30,7 +30,7 @@ public class LoginController {
     private JwtTokenProvider jwtTokenProvider;
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String loginForm(HttpServletRequest request, HttpServletResponse response, Model model){
+    public String loginForm(HttpServletRequest request, HttpServletResponse response, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             model.addAttribute("login", new LoginRequest());
@@ -42,12 +42,12 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
-    public String getHome(HttpServletRequest request, Model model){
+    public String getHome(HttpServletRequest request, Model model) {
         String token = "";
 
         Cookie[] cookies = null;
         cookies = request.getCookies();
-        for (Cookie cookie : cookies){
+        for (Cookie cookie : cookies) {
             if (cookie.getName().equals(Contrants.TOKEN)) {
                 token = cookie.getValue();
             }
@@ -64,7 +64,7 @@ public class LoginController {
 
         Cookie[] cookies = null;
         cookies = request.getCookies();
-        for (Cookie cookie : cookies){
+        for (Cookie cookie : cookies) {
             if (cookie.getName().equals(Contrants.TOKEN)) {
                 token = cookie.getValue();
             }

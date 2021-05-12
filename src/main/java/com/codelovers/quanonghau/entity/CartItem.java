@@ -37,11 +37,12 @@ public class CartItem implements Serializable {
 
     // method getSubtotal doesn't use in Seriable
     @Transient
-    public float getSubtotal(){
+    public float getSubtotal() {
         return this.product.getPrice() * quantity;
     }
 
-    public CartItem(){ }
+    public CartItem() {
+    }
 
     public Integer getId() {
         return id;

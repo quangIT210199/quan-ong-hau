@@ -8,7 +8,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "products")
-public class Product implements Serializable{
+public class Product implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -100,7 +100,7 @@ public class Product implements Serializable{
 
     @Transient
     public String getMainImagePath() {
-        if (id == null || mainImage == null ) {
+        if (id == null || mainImage == null) {
             return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/product-photo/default-user.png").toUriString();
         }
 

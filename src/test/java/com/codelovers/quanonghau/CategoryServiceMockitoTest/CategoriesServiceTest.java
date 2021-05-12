@@ -26,8 +26,8 @@ public class CategoriesServiceTest {
     @Test
     public void testCheckUniqueInNewModelReturnDuplicateName() {
         Integer id = null;
-        String name ="Computer";
-        String alais ="abc";
+        String name = "Computer";
+        String alais = "abc";
 
         Category category = new Category(id, name, alais);
 

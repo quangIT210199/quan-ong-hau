@@ -38,7 +38,7 @@ public class ProductSaveHelper {
     }
 
     public static void setNewExtraImageNames(MultipartFile[] extraImageFiles, Product product) {
-        if(extraImageFiles.length > 0) {
+        if (extraImageFiles.length > 0) {
             for (MultipartFile multipartFile : extraImageFiles) {
                 if (!multipartFile.isEmpty()) {
                     String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
@@ -64,10 +64,9 @@ public class ProductSaveHelper {
             String name = detailNames[count];
             String value = detailValues[count];
 
-            if(id != 0) {
+            if (id != 0) {
                 product.addDetails(id, name, value);
-            }
-            else if(!name.isEmpty() && !value.isEmpty()) {
+            } else if (!name.isEmpty() && !value.isEmpty()) {
                 product.addDetails(name, value);
             }
         }
@@ -83,7 +82,7 @@ public class ProductSaveHelper {
         }
 
         if (extraImage.length > 0) {
-            String uploadDir = "images/product-photo/" + savedProduct.getId() +"/extras/";
+            String uploadDir = "images/product-photo/" + savedProduct.getId() + "/extras/";
 
             for (MultipartFile multipartFile : extraImage) {
                 if (multipartFile.isEmpty()) continue;
@@ -95,7 +94,7 @@ public class ProductSaveHelper {
     }
 
     public static void deleteExtraImagesWereRemovedOnForm(Product product) { // Xóa ảnh trong folder
-        String extraImageDir = "images/product-photo/" + product.getId() +"/extras/";
+        String extraImageDir = "images/product-photo/" + product.getId() + "/extras/";
 
         Path dir = Paths.get(extraImageDir);
 

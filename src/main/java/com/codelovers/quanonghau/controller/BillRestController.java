@@ -23,11 +23,11 @@ public class BillRestController {
     CartItemService cartItemSer;
 
     @GetMapping(value = "/bill/{bid}", produces = "application/json")
-    public ResponseEntity<?> getBill(@PathVariable(name = "bid") Integer bid){
+    public ResponseEntity<?> getBill(@PathVariable(name = "bid") Integer bid) {
 
         Bill bill = billSer.findById(bid);
-        if(bill == null){
-            return new ResponseEntity<>("Không có bill",HttpStatus.NO_CONTENT);
+        if (bill == null) {
+            return new ResponseEntity<>("Không có bill", HttpStatus.NO_CONTENT);
         }
 
         return new ResponseEntity<>(bill, HttpStatus.OK);
@@ -41,7 +41,7 @@ public class BillRestController {
 
     // Get info bill ID of user by id
     @GetMapping(value = "/bill", produces = "application/json")
-    public ResponseEntity<?>showBillOfUser(@RequestParam(value = "uid") Integer uid){
+    public ResponseEntity<?> showBillOfUser(@RequestParam(value = "uid") Integer uid) {
         // Làm authen để xác định user
         List<Bill> listBill = billSer.findAllBillByUserId(uid);
 
@@ -50,18 +50,18 @@ public class BillRestController {
 
     // Tạo Bill khi click btn CheckOut và gán billId cho các sp trong giỏ hàng
     @PostMapping(value = "/bill/{uid}", produces = "application/json")
-    public ResponseEntity<?> createBill(@RequestBody Integer[] cartIds, @PathVariable int uid){
+    public ResponseEntity<?> createBill(@RequestBody Integer[] cartIds, @PathVariable int uid) {
 
-        if(cartIds.length - 1 < 0){
+        if (cartIds.length - 1 < 0) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         // Cần check User của giỏ hàng đó thì các CartItem tồn tại BillId chưa
         // Cần làm thêm authen để tìm kiếm cùng user định danh giỏ hàng của user nào
-        for (Integer c : cartIds){
+        for (Integer c : cartIds) {
             // Check CartItem có Bill chưa để CreateBill
             CartItem cartItem = cartItemSer.findByIdAndUser(c, uid);
-            if(cartItem.getBill() != null){
-                return new ResponseEntity<>("Khong hợp lệ",HttpStatus.NO_CONTENT);
+            if (cartItem.getBill() != null) {
+                return new ResponseEntity<>("Khong hợp lệ", HttpStatus.NO_CONTENT);
             }
         }
 
@@ -74,7 +74,7 @@ public class BillRestController {
         //Xét billId vào CardItem
         cartItemSer.updateBillId(billId, cartIds);
 
-        return new ResponseEntity<>("Tạo Bill thành công!",HttpStatus.OK);
+        return new ResponseEntity<>("Tạo Bill thành công!", HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
@@ -82,7 +82,7 @@ public class BillRestController {
     public ResponseEntity<?> removeBill(@PathVariable(name = "bid") Integer bid) {
         Bill bill = billSer.findById(bid);
 
-        if(bill == null){
+        if (bill == null) {
             return new ResponseEntity<>("Không tồn tại", HttpStatus.NO_CONTENT);
         }
 

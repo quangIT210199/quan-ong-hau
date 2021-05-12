@@ -1,4 +1,4 @@
-package com.codelovers.quanonghau.controller;
+package com.codelovers.quanonghau.controller.admin;
 
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.controller.output.PagingProduct;
@@ -56,9 +56,9 @@ public class ProductController {
 
     @GetMapping(value = "/product/page", produces = "application/json")
     public ResponseEntity<?> listProduct(@RequestParam(value = "pageNum") Integer pageNum,
-                                          @RequestParam(value = "sortField") String sortField,
-                                          @RequestParam(value = "sortDir") String sortDir,
-                                          @RequestParam(value = "keyword") String keyword,
+                                         @RequestParam(value = "sortField") String sortField,
+                                         @RequestParam(value = "sortDir") String sortDir,
+                                         @RequestParam(value = "keyword") String keyword,
                                          @RequestParam(value = "categoryID") Integer categoryID) {
         Page<Product> page = productSer.listByPage(pageNum, sortField, sortDir, keyword, categoryID);
         // Using Search with Product => Get all list categories
@@ -66,7 +66,7 @@ public class ProductController {
 
         System.out.println("Category is Selected id: " + categoryID);
         List<Product> listProduct = page.getContent();
-        long startCount = (pageNum -1) * Contrants.PRODUCT_PER_PAGE + 1; // Start at index element
+        long startCount = (pageNum - 1) * Contrants.PRODUCT_PER_PAGE + 1; // Start at index element
         long endCount = startCount + Contrants.PRODUCT_PER_PAGE - 1; // Index of End element
 
         if (endCount > page.getTotalElements()) { // The last page
@@ -111,7 +111,7 @@ public class ProductController {
     public ResponseEntity<?> saveProduct(String productJson,
                                          @RequestParam(value = "fileImage", required = false) MultipartFile mainImage,
                                          @RequestParam(value = "extraImage", required = false) MultipartFile[] extraImage,
-                                         @RequestParam(value = "detailIDs", required = false) String [] detailIDs,
+                                         @RequestParam(value = "detailIDs", required = false) String[] detailIDs,
                                          @RequestParam(value = "detailNames", required = false) String[] detailNames,
                                          @RequestParam(value = "detailValues", required = false) String[] detailValues,
                                          @RequestParam(value = "imageIDs", required = false) String[] imageIDs,
@@ -135,7 +135,7 @@ public class ProductController {
         return new ResponseEntity(savedProduct, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/product/edit" , produces = "application/json")
+    @GetMapping(value = "/product/edit", produces = "application/json")
     public ResponseEntity<?> editProduct(@RequestParam(value = "id") Integer id) {
         try {
             Product product = productSer.get(id);
@@ -156,7 +156,7 @@ public class ProductController {
     @GetMapping(value = "/product/{id}/enabled/{status}", produces = "application/json")
     public ResponseEntity<?> updateProductEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled) {
         Product product = productSer.findById(id);
-        if(product == null) {
+        if (product == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
@@ -172,7 +172,7 @@ public class ProductController {
         try {
             productSer.deleteProductById(id);
 
-            String productExtraImagesDir = "images/product-photo/" + id +"/extras";
+            String productExtraImagesDir = "images/product-photo/" + id + "/extras";
             String productImagesDir = "images/product-photo/" + id;
 
             FileUploadUtil.removeDir(productExtraImagesDir);
