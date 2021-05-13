@@ -3,6 +3,8 @@ package com.codelovers.quanonghau.help;
 import com.codelovers.quanonghau.entity.Product;
 import com.codelovers.quanonghau.entity.ProductImage;
 import com.codelovers.quanonghau.util.FileUploadUtil;
+import com.codelovers.quanonghau.util.QRCodeGenerator;
+import com.google.zxing.WriterException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -93,6 +95,24 @@ public class ProductSaveHelper {
         }
     }
 
+    public static void saveUploadQRCode(Product savedProduct, int height, int width) throws IOException, WriterException {
+        // Using when create or save Product
+        String uploadDir = "images/product-photo/" + savedProduct.getId() + "/qrcode/";
+
+        FileUploadUtil.cleanDir(uploadDir);
+
+        Path uploadPath = Paths.get(uploadDir);
+
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        String filePath = uploadDir + savedProduct.getQrCodeImage();
+        String text = savedProduct.getId() +":"+ savedProduct.getName();
+
+        QRCodeGenerator.generateQRCodeImage(text, width, height, filePath);
+    }
+
     public static void deleteExtraImagesWereRemovedOnForm(Product product) { // Xóa ảnh trong folder
         String extraImageDir = "images/product-photo/" + product.getId() + "/extras/";
 
@@ -105,7 +125,6 @@ public class ProductSaveHelper {
                 if (!product.containsImageName(fileName)) {
                     try {
                         Files.delete(file);
-                        System.out.println("Delete success");
                     } catch (IOException e) {
                         e.printStackTrace();
                         System.out.println("Could not delete extra image: " + fileName);

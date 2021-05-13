@@ -13,6 +13,8 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, I
 
     Product findByName(String name);
 
+    Product findByIdAndName(Integer id, String name);
+
     @Query("UPDATE Product p SET p.enabled =?2 WHERE p.id =?1")
     @Modifying
     void updateProductEnabledStatus(Integer id, boolean enabled);

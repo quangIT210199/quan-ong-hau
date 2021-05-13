@@ -12,10 +12,12 @@ import com.codelovers.quanonghau.service.UserService;
 import com.codelovers.quanonghau.util.FileUploadUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -238,10 +241,26 @@ public class UserController {
     }
 
     /*PDF*/
+//    @GetMapping(value = "/user/export/pdf", produces = {"application/octet-stream"})
+//    public ResponseEntity<?> exportToPDF() throws IOException {
+//        List<User> listUsers = userSer.listAll();
+//        UserPdfExporter exporter = new UserPdfExporter();
+//
+//        ByteArrayOutputStream dsf = new ByteArrayOutputStream();
+//        exporter.export(listUsers, dsf);
+//
+//        ByteArrayResource resource = new ByteArrayResource(dsf.toByteArray());
+//
+//        return new ResponseEntity<>(resource, HttpStatus.OK);
+//    }
+
+    /*PDF*/
     @GetMapping("/user/export/pdf")
-    public void exportToPDF(HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> exportToPDF(HttpServletResponse response) throws IOException {
         List<User> listUsers = userSer.listAll();
         UserPdfExporter exporter = new UserPdfExporter();
         exporter.export(listUsers, response);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -7,13 +7,17 @@ import com.codelovers.quanonghau.dto.NewProductDTO;
 import com.codelovers.quanonghau.entity.Category;
 import com.codelovers.quanonghau.entity.Product;
 import com.codelovers.quanonghau.entity.ProductImage;
+import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
+import com.codelovers.quanonghau.export.ProductPdfExporter;
+import com.codelovers.quanonghau.export.UserPdfExporter;
 import com.codelovers.quanonghau.help.ProductSaveHelper;
 import com.codelovers.quanonghau.service.CategoryService;
 import com.codelovers.quanonghau.service.ProductService;
 import com.codelovers.quanonghau.util.FileUploadUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.WriterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +28,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -115,7 +120,9 @@ public class ProductController {
                                          @RequestParam(value = "detailNames", required = false) String[] detailNames,
                                          @RequestParam(value = "detailValues", required = false) String[] detailValues,
                                          @RequestParam(value = "imageIDs", required = false) String[] imageIDs,
-                                         @RequestParam(value = "imageNames", required = false) String[] imageNames) throws IOException {
+                                         @RequestParam(value = "imageNames", required = false) String[] imageNames,
+                                         @RequestParam(value = "heightQR", defaultValue = "200") Integer heightQR,
+                                         @RequestParam(value = "widthQR", defaultValue = "200") Integer widthQR) throws IOException, WriterException {
         ObjectMapper mapper = new ObjectMapper();
         Product product = mapper.readValue(productJson, Product.class);
 
@@ -126,7 +133,12 @@ public class ProductController {
         ProductSaveHelper.setNewExtraImageNames(extraImage, product); // Set newExtraImage to the Set collection
         ProductSaveHelper.setProductDetails(detailIDs, detailNames, detailValues, product);
 
+        product.setQrCodeImage("QRCode.png");
+
         Product savedProduct = productSer.saveProduct(product);
+        System.out.println(savedProduct.getQrCodeImage());
+        // Save QR code
+        ProductSaveHelper.saveUploadQRCode(savedProduct, heightQR, widthQR);
 
         ProductSaveHelper.saveUploadImages(mainImage, extraImage, savedProduct);
 
@@ -134,6 +146,20 @@ public class ProductController {
 
         return new ResponseEntity(savedProduct, HttpStatus.OK);
     }
+
+    // Get Infomation Product when scanner QRCode image
+    @GetMapping(value = "/product/{id}/{name}")
+    public ResponseEntity<?> getProductByQRCode(@PathVariable(name = "id") Integer id,
+                                               @PathVariable(name = "name") String name) {
+        Product product = productSer.findByIdAndName(id, name);
+        if (product == null) {
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity(product, HttpStatus.OK);
+    }
+
+    // Download QR code in PDF
 
     @GetMapping(value = "/product/edit", produces = "application/json")
     public ResponseEntity<?> editProduct(@RequestParam(value = "id") Integer id) {
@@ -172,9 +198,11 @@ public class ProductController {
         try {
             productSer.deleteProductById(id);
 
-            String productExtraImagesDir = "images/product-photo/" + id + "/extras";
+            String productExtraImagesDir = "images/product-photo/" + id + "/extras/";
             String productImagesDir = "images/product-photo/" + id;
+            String qrCodeImageDir = "images/product-photo/" + id + "/qrcode/";
 
+            FileUploadUtil.removeDir(qrCodeImageDir);
             FileUploadUtil.removeDir(productExtraImagesDir);
             FileUploadUtil.removeDir(productImagesDir);
 
@@ -188,5 +216,20 @@ public class ProductController {
     @PostMapping(value = "/product/check_unique", produces = "application/json")
     public String checkUnique(@Param(value = "id") Integer id, @Param(value = "name") String name) {
         return productSer.checkUnique(id, name);
+    }
+
+    /*PDF*/
+    @GetMapping("/product/exportQR/pdf/{id}")
+    public ResponseEntity<?> exportQRCodeToPDF(HttpServletResponse response, @PathVariable(name = "id") Integer id) throws IOException {
+
+        Product product = productSer.findById(id);
+        if (product == null || product.getQrCodeImage() == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        ProductPdfExporter exporter = new ProductPdfExporter();
+        exporter.exportQRCode(product, response);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

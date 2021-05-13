@@ -10,6 +10,8 @@ public interface ProductService {
 
     Product findById(Integer id);
 
+    Product findByIdAndName(Integer id, String name);
+
     List<Product> listAll();
 
     Product saveProduct(Product product);

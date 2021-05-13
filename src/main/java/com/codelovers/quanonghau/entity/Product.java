@@ -52,6 +52,9 @@ public class Product implements Serializable {
     @Column(name = "main_image", nullable = false)
     private String mainImage;
 
+    @Column(name = "qr_code_image")
+    private String qrCodeImage;
+
     // orphanRemoval: Mối đối tượng company sẽ chứa 1 tập hợp các đối tượng employee, khi một đối tượng employee bị xóa khỏi tập hợp đó thì nó sẽ bị xóa khỏi database.
     // CascadeType.ALL: bất cứ sự thay đổi với parent(Product) sẽ update chile(ProductImage)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -106,7 +109,23 @@ public class Product implements Serializable {
 
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/product-photo/" + this.id + "/" + this.mainImage).toUriString();
     }
+
+    @Transient
+    public String getQrCodeImagePath(){
+        if (id == null || qrCodeImage == null) {
+            return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/product-photo/default-user.png").toUriString();
+        }
+
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/product-photo/" + this.id + "/qrcode/" + this.qrCodeImage).toUriString();
+    }
     ///
+    public void setQrCodeImage(String qrCodeImage) {
+        this.qrCodeImage = qrCodeImage;
+    }
+
+    public String getQrCodeImage() {
+        return qrCodeImage;
+    }
 
     public float getDiscountPercent() {
         return discountPercent;

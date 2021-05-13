@@ -29,6 +29,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Product findByIdAndName(Integer id, String name) {
+        return productRepo.findByIdAndName(id, name);
+    }
+
+    @Override
     public List<Product> listAll() {
         return (List<Product>) productRepo.findAll();
     }
