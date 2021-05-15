@@ -30,4 +30,6 @@ public interface ProductService {
     Page<Product> listByCategory(Integer pageNum, Integer categoryId);
 
     Product findByAlias(String alias) throws ProductNotFoundException;
+
+    Page<Product> search(int pageNum, String keyword);
 }

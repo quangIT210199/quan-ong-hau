@@ -34,14 +34,14 @@ public class BillRestController {
     }
 
 //    @GetMapping(value = "/bill/page", produces = "application/json")
-//    public ResponseEntity<?> listBill(@RequestParam(value = "pageNum") Integer pageNum, @RequestParam(value = "sortField") String sortField,
-//                                      @RequestParam(value = "sortDir") String sortDir, @RequestParam("keyword") String keyword) {
+//    public ResponseEntity<?> listBill(@RequestParam(name = "pageNum") Integer pageNum, @RequestParam(name = "sortField") String sortField,
+//                                      @RequestParam(name = "sortDir") String sortDir, @RequestParam(name = "keyword") String keyword) {
 //
 //    }
 
     // Get info bill ID of user by id
     @GetMapping(value = "/bill", produces = "application/json")
-    public ResponseEntity<?> showBillOfUser(@RequestParam(value = "uid") Integer uid) {
+    public ResponseEntity<?> showBillOfUser(@RequestParam(name = "uid") Integer uid) {
         // Làm authen để xác định user
         List<Bill> listBill = billSer.findAllBillByUserId(uid);
 

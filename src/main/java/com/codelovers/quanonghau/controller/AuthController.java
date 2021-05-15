@@ -69,6 +69,12 @@ public class AuthController {
                 customUserDetails.getUser().getId(), customUserDetails.getUsername(), roles), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/register", produces = "application/json")
+    public ResponseEntity<?> viewRegisterForm() {
+
+        return new ResponseEntity<>(new SignupRequest(), HttpStatus.OK);
+    }
+
     //For User, need code @Valid
     @PostMapping(value = "/signup", produces = "application/json")
     public ResponseEntity<?> registerUser(@Validated @RequestBody SignupRequest signupRequest) {
@@ -88,7 +94,7 @@ public class AuthController {
         user.setEnabled(true);
         userSer.createdUser(user);
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>("Registration success", HttpStatus.OK);
     }
 
     //Forgot password

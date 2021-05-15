@@ -127,4 +127,11 @@ public class ProductServiceImpl implements ProductService {
 
         return product;
     }
+
+    @Override
+    public Page<Product> search(int pageNum, String keyword) {
+        Pageable pageable = PageRequest.of(pageNum - 1, Contrants.SEARCH_PRODUCT_PER_PAGE);
+
+        return productRepo.fullTextSearch(keyword, pageable);
+    }
 }

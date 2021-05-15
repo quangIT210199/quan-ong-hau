@@ -120,7 +120,7 @@ public class CategoryController {
     }
 
     @GetMapping(value = "/category/edit", produces = "application/json")
-    public ResponseEntity<EditCategoryDTO> editCategory(@RequestParam(value = "id") Integer id) {
+    public ResponseEntity<EditCategoryDTO> editCategory(@RequestParam(name = "id") Integer id) {
         Category category = categorySer.findCategoryById(id);
 
         if (category == null)
