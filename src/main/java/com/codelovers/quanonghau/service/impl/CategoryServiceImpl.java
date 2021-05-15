@@ -239,4 +239,49 @@ public class CategoryServiceImpl implements CategoryService {
 
         categoryRepo.deleteById(id);
     }
+
+    /////// FOR USER
+    @Override
+    public List<Category> listNoChildrenCategories() {
+        List<Category> listNochildrenCategories = new ArrayList<>();
+
+        List<Category> listEnabledCategories = categoryRepo.findAllEnabled();
+
+        listEnabledCategories.forEach(category -> {
+            Set<Category> children = category.getChildren();
+            if (children == null || children.size() == 0) {
+                listNochildrenCategories.add(category);
+            }
+        });
+
+        return listNochildrenCategories;
+    }
+
+    @Override
+    public Category getCategoryByAlias(String alias) throws CategoryNotFoundException {
+        Category category = categoryRepo.findByAliasEnabled(alias);
+
+        if (category == null) {
+            throw new CategoryNotFoundException("Could not find Category by alias: " + alias);
+        }
+
+        return category;
+    }
+
+    @Override
+    public List<Category> getCategoryParents(Category child) { // Using this for BreadCrumb, this while file all parent of Child
+        List<Category> listParents = new ArrayList<>();
+
+        Category parent = child.getParent();
+        System.out.println(parent.getName() + " " + parent.getId());
+
+        while (parent != null) {
+            listParents.add(0, parent);
+            parent = parent.getParent();
+        }
+
+        listParents.add(child);
+
+        return listParents;
+    }
 }

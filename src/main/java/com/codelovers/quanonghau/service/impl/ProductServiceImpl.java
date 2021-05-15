@@ -108,4 +108,23 @@ public class ProductServiceImpl implements ProductService {
             throw new ProductNotFoundException("Counld not find product with id: " + id);
         }
     }
+
+    /////////////////// FOR USER
+    @Override
+    public Page<Product> listByCategory(Integer pageNum, Integer categoryId) {
+        String categoryIdMatch = "-" + String.valueOf(categoryId)+ "-";
+        Pageable pageable = PageRequest.of(pageNum - 1, Contrants.PRODUCT_PER_PAGE);
+
+        return productRepo.listByCategory(categoryId, categoryIdMatch, pageable);
+    }
+
+    @Override
+    public Product findByAlias(String alias) throws ProductNotFoundException {
+        Product product = productRepo.findByAlias(alias);
+        if (product == null) {
+            throw new ProductNotFoundException("Could find product with alias: " + alias);
+        }
+
+        return product;
+    }
 }

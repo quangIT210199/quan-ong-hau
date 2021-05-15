@@ -1,4 +1,4 @@
-package com.codelovers.quanonghau.controller.output;
+package com.codelovers.quanonghau.controller.output.admin;
 
 import com.codelovers.quanonghau.entity.User;
 import lombok.Data;

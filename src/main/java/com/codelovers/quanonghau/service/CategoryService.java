@@ -25,4 +25,12 @@ public interface CategoryService {
     void updateCategoryEnableStatus(Integer id, boolean enabled);
 
     void deleteCategoryById(Integer id) throws CategoryNotFoundException;
+
+
+    ///// FOR USER
+    List<Category> listNoChildrenCategories();
+
+    Category getCategoryByAlias(String alias) throws CategoryNotFoundException;
+
+    List<Category> getCategoryParents(Category child); // Using this for Breadcrumb
 }

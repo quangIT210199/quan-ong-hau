@@ -118,6 +118,24 @@ public class Product implements Serializable {
 
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("images/product-photo/" + this.id + "/qrcode/" + this.qrCodeImage).toUriString();
     }
+
+    @Transient
+    public String getShortName() {
+        if (name.length() > 70) {
+            return name.substring(0, 70).concat("...");
+        }
+
+        return name;
+    }
+
+    @Transient
+    public double getDiscountPrice() {
+        if (discountPercent > 0) {
+            return price *((100 - discountPercent) / 100);
+        }
+
+        return this.price;
+    }
     ///
     public void setQrCodeImage(String qrCodeImage) {
         this.qrCodeImage = qrCodeImage;

@@ -25,4 +25,9 @@ public interface ProductService {
     Product get(Integer id) throws ProductNotFoundException;
 
     Page<Product> listByPage(int pageNum, String sortField, String sortDir, String keyword, Integer categoryId);
+
+    ///////////// FOR USER
+    Page<Product> listByCategory(Integer pageNum, Integer categoryId);
+
+    Product findByAlias(String alias) throws ProductNotFoundException;
 }

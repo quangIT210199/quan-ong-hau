@@ -1,21 +1,17 @@
 package com.codelovers.quanonghau.controller.admin;
 
 import com.codelovers.quanonghau.contrants.Contrants;
-import com.codelovers.quanonghau.controller.output.PagingProduct;
+import com.codelovers.quanonghau.controller.output.admin.PagingProduct;
 import com.codelovers.quanonghau.dto.EditProductDTO;
 import com.codelovers.quanonghau.dto.NewProductDTO;
 import com.codelovers.quanonghau.entity.Category;
 import com.codelovers.quanonghau.entity.Product;
-import com.codelovers.quanonghau.entity.ProductImage;
-import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
 import com.codelovers.quanonghau.export.ProductPdfExporter;
-import com.codelovers.quanonghau.export.UserPdfExporter;
 import com.codelovers.quanonghau.help.ProductSaveHelper;
 import com.codelovers.quanonghau.service.CategoryService;
 import com.codelovers.quanonghau.service.ProductService;
 import com.codelovers.quanonghau.util.FileUploadUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +19,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/products")

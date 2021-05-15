@@ -46,6 +46,7 @@ public class Category implements Serializable {
 
     @OneToMany(mappedBy = "parent")
     @JsonIgnore
+    @OrderBy("name asc") // This annonition just work with relationship OneToMany and ManyToMany
     private Set<Category> children = new HashSet<>();
 
     @Transient

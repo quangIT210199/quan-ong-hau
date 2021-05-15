@@ -1,8 +1,9 @@
 package com.codelovers.quanonghau.controller.admin;
 
 import com.codelovers.quanonghau.contrants.Contrants;
-import com.codelovers.quanonghau.controller.output.PagingCategories;
-import com.codelovers.quanonghau.dto.CategoryDTO;
+import com.codelovers.quanonghau.controller.output.admin.PagingCategories;
+import com.codelovers.quanonghau.dto.EditCategoryDTO;
+import com.codelovers.quanonghau.dto.NewCategoryDTO;
 import com.codelovers.quanonghau.entity.Category;
 import com.codelovers.quanonghau.exception.CategoryNotFoundException;
 import com.codelovers.quanonghau.help.PageInfoCategory;
@@ -86,9 +87,14 @@ public class CategoryController {
     // This API using when open form to create or update
     @GetMapping(value = "/category/new", produces = "application/json")
     public ResponseEntity<?> newCategory() {
+        Category category = new Category();
         List<Category> listCate = categorySer.listCategoryUsedInForm();
 
-        return new ResponseEntity<>(listCate, HttpStatus.OK);
+        NewCategoryDTO newCategoryDTO = new NewCategoryDTO();
+        newCategoryDTO.setCategory(category);
+        newCategoryDTO.setListCategories(listCate);
+
+        return new ResponseEntity<>(newCategoryDTO, HttpStatus.OK);
     }
 
     // Cần tách ra làm 2 API
@@ -114,7 +120,7 @@ public class CategoryController {
     }
 
     @GetMapping(value = "/category/edit", produces = "application/json")
-    public ResponseEntity<CategoryDTO> editCategory(@RequestParam(value = "id") Integer id) {
+    public ResponseEntity<EditCategoryDTO> editCategory(@RequestParam(value = "id") Integer id) {
         Category category = categorySer.findCategoryById(id);
 
         if (category == null)
@@ -122,12 +128,12 @@ public class CategoryController {
 
         List<Category> listCategory = categorySer.listCategoryUsedInForm();
 
-        CategoryDTO categoryDTO = new CategoryDTO();
-        categoryDTO.setId(category.getId());
-        categoryDTO.setCategory(category);
-        categoryDTO.setListCategory(listCategory);
+        EditCategoryDTO editCategoryDTO = new EditCategoryDTO();
+        editCategoryDTO.setId(category.getId());
+        editCategoryDTO.setCategory(category);
+        editCategoryDTO.setListCategory(listCategory);
 
-        return new ResponseEntity<CategoryDTO>(categoryDTO, HttpStatus.OK);
+        return new ResponseEntity<EditCategoryDTO>(editCategoryDTO, HttpStatus.OK);
     }
 
     @PostMapping(value = "/category/check_unique", produces = "application/json")
