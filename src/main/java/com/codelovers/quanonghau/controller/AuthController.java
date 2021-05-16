@@ -10,9 +10,13 @@ import com.codelovers.quanonghau.security.payload.LoginResponse;
 import com.codelovers.quanonghau.security.payload.SignupRequest;
 import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
+import com.codelovers.quanonghau.util.MailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMailMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,14 +24,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
@@ -76,8 +84,8 @@ public class AuthController {
     }
 
     //For User, need code @Valid
-    @PostMapping(value = "/signup", produces = "application/json")
-    public ResponseEntity<?> registerUser(@Validated @RequestBody SignupRequest signupRequest) {
+    @PostMapping(value = "/create_user", produces = "application/json")
+    public ResponseEntity<?> createUser(@Validated @RequestBody SignupRequest signupRequest, HttpServletRequest request) throws UnsupportedEncodingException, MessagingException {
 
         if (userSer.exitUserByEmail(signupRequest.getEmail())) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -92,10 +100,49 @@ public class AuthController {
 
         user.setRoles(roles);
         user.setEnabled(true);
-        userSer.createdUser(user);
+        userSer.registerUser(user);
+
+        System.out.println("Verify Code: " + user.getVerificationCode());
+        sendVerificationEmail(request, user);
 
         return new ResponseEntity<>("Registration success", HttpStatus.OK);
     }
 
-    //Forgot password
+    private void sendVerificationEmail(HttpServletRequest request, User user) throws UnsupportedEncodingException, MessagingException {
+        JavaMailSenderImpl mailSender = MailUtil.prepareMailSender();
+
+        String toAddress = user.getEmail();
+        String subject = Contrants.USER_VERIFY_SUBJECT;
+        String content = Contrants.USER_VERIFY_CONTENT;
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper help = new MimeMessageHelper(message);
+
+        help.setFrom(Contrants.MAIL_FROM, Contrants.MAIL_SENDER_NAME);
+        help.setTo(toAddress);
+        help.setSubject(subject);
+
+        content = content.replace("[[name]]", user.getFullName());
+
+        String verifyURL = MailUtil.getSiteURL(request) + "/verify?code=" + user.getVerificationCode();
+        System.out.println(verifyURL);
+        content = content.replace("[[URL]]", verifyURL);
+
+        help.setText(content, true);
+
+        mailSender.send(message);
+
+        System.out.println("to Address: " + toAddress);
+        System.out.println("Verify URL: " + verifyURL);
+    }
+
+    @GetMapping(value = "/verify", produces = "application/json")
+    public ResponseEntity<?> verifyAccount(@RequestParam(name = "code") String code) {
+
+        boolean verified = userSer.verifyCode(code);
+
+        String result = verified ? "Congratulations! Your account has been verified." : "Your account was already verified, or the verification code is invalid";
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }

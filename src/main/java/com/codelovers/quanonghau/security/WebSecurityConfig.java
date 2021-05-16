@@ -73,7 +73,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/login").permitAll() // Cho phép tất cả mọi người truy cập vào địa chỉ này
+                .antMatchers("/api/auth/**").permitAll() // Cho phép tất cả mọi người truy cập vào địa chỉ này
                 .antMatchers("/api/signup").permitAll()
                 .antMatchers("/api/products/**").hasRole("ADMIN")
                 .antMatchers("/api/categories/**").hasRole("ADMIN")

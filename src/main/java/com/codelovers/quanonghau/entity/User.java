@@ -32,6 +32,9 @@ public class User implements Serializable {
     @Column(name = "password", length = 64, nullable = false)
     private String password;
 
+    @Column(name = "verification_code", length = 64)
+    private String verificationCode;
+
     @Column(name = "photos", length = 64)
     private String photos;
 
@@ -179,5 +182,13 @@ public class User implements Serializable {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
     }
 }

@@ -35,4 +35,9 @@ public interface UserService {
     void changePassword(User user, String newPassword);
 
     User updateAccount(User userInForm);
+
+    ////// THIS method using for USER like Customer
+    void registerUser(User user);
+
+    boolean verifyCode(String verificationCode);
 }

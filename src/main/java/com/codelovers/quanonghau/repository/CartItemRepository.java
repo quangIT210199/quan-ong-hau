@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
+public interface  CartItemRepository extends JpaRepository<CartItem, Integer> {
 
     @Query(value = "SELECT * FROM cart_item u WHERE u.user_id = ?1 AND u.bill_id IS NULL",
             nativeQuery = true)

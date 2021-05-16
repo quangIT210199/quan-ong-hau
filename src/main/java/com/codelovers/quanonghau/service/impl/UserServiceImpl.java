@@ -6,6 +6,7 @@ import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.repository.UserRepository;
 import com.codelovers.quanonghau.security.CustomUserDetails;
 import com.codelovers.quanonghau.service.UserService;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +21,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional // Because we using query update/delete in Repository
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
         return userRepo.getUserByEmail(email);
     }
 
-    @Override // Chua dc su dung
+    @Override // Chưa được dùng
     public User getCurrentlyLoggedInUser(Authentication authentication) {
         if (authentication == null)
             return null;
@@ -136,6 +137,7 @@ public class UserServiceImpl implements UserService {
         return userRepo.save(user);
     }
 
+    // Using in AccountController
     @Override
     public User updateAccount(User userInForm) {
         User userInDB = userRepo.findById(userInForm.getId()).get();
@@ -154,6 +156,7 @@ public class UserServiceImpl implements UserService {
 
         return userRepo.save(userInDB);
     }
+    ////////////////
 
     @Override
     public void updateUserEnabledStatus(Integer id, boolean enabled) {
@@ -174,5 +177,30 @@ public class UserServiceImpl implements UserService {
     private void encodePassword(User user) {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
+    }
+
+    /////////////////// THIS method using for USER like Customer
+    @Override
+    public void registerUser(User user) {
+        encodePassword(user);
+        user.setEnabled(false);
+
+        String randomCode = RandomString.make(64);
+        user.setVerificationCode(randomCode);
+
+        userRepo.save(user);
+    }
+
+    @Override
+    public boolean verifyCode(String verificationCode) {
+        User user = userRepo.getUserByVerificationCode(verificationCode);
+
+        if (user == null || user.isEnabled()) {
+            return false;
+        }
+        else {
+            userRepo.enable(user.getId());
+            return true;
+        }
     }
 }

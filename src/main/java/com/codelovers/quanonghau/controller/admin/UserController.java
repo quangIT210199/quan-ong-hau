@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-// Need Code return Image with REST API -.-
+// This Controlle using for manager User
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -143,7 +143,6 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    // Cần tách ra làm 2 API (1)
     //can use @RequestParam("image"), this API create User By ADMIN or update USER
     // User user is must input form-data
     @PostMapping(value = "/user/save", consumes = {"multipart/form-data"}, produces = "application/json")
@@ -167,11 +166,6 @@ public class UserController {
         } else {
             if (user.getPhotos().isEmpty()) user.setPhotos(null);
             savedUser = userSer.createdUser(user);
-        }
-
-        Set<Role> list = savedUser.getRoles();
-        for (Role r : list) {
-            System.out.println(r.getId() + " " + r.getName());
         }
 
         return new ResponseEntity<>(savedUser, HttpStatus.OK);
