@@ -1,10 +1,10 @@
 package com.codelovers.quanonghau.controller;
 
 import com.codelovers.quanonghau.controller.output.UpdatePassword;
-import com.codelovers.quanonghau.entity.User;
-import com.codelovers.quanonghau.security.CustomUserDetails;
+import com.codelovers.quanonghau.models.User;
+import com.codelovers.quanonghau.configs.CustomUserDetails;
 import com.codelovers.quanonghau.service.UserService;
-import com.codelovers.quanonghau.util.FileUploadUtil;
+import com.codelovers.quanonghau.utils.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

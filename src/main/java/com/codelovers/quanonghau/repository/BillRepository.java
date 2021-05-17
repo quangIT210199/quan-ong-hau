@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.repository;
 
-import com.codelovers.quanonghau.entity.Bill;
+import com.codelovers.quanonghau.models.Bill;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;

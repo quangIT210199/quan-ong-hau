@@ -1,11 +1,10 @@
 package com.codelovers.quanonghau.controller;
 
-import com.codelovers.quanonghau.entity.CartItem;
-import com.codelovers.quanonghau.entity.Product;
-import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.models.CartItem;
+import com.codelovers.quanonghau.models.Product;
+import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
-import com.codelovers.quanonghau.exception.UserNotFoundException;
-import com.codelovers.quanonghau.security.CustomUserDetails;
+import com.codelovers.quanonghau.configs.CustomUserDetails;
 import com.codelovers.quanonghau.service.CartItemService;
 import com.codelovers.quanonghau.service.ProductService;
 import com.codelovers.quanonghau.service.UserService;

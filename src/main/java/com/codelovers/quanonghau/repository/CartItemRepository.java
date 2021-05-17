@@ -1,9 +1,9 @@
 package com.codelovers.quanonghau.repository;
 
-import com.codelovers.quanonghau.entity.Bill;
-import com.codelovers.quanonghau.entity.CartItem;
-import com.codelovers.quanonghau.entity.Product;
-import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.models.Bill;
+import com.codelovers.quanonghau.models.CartItem;
+import com.codelovers.quanonghau.models.Product;
+import com.codelovers.quanonghau.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

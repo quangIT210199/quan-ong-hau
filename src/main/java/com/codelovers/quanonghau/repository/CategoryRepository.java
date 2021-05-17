@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.repository;
 
-import com.codelovers.quanonghau.entity.Category;
+import com.codelovers.quanonghau.models.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

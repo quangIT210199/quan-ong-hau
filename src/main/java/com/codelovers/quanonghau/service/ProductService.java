@@ -1,8 +1,7 @@
 package com.codelovers.quanonghau.service;
 
-import com.codelovers.quanonghau.entity.Product;
+import com.codelovers.quanonghau.models.Product;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
-import com.codelovers.quanonghau.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

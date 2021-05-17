@@ -1,8 +1,7 @@
 package com.codelovers.quanonghau.CategoryServiceMockitoTest;
 
-import com.codelovers.quanonghau.entity.Category;
+import com.codelovers.quanonghau.models.Category;
 import com.codelovers.quanonghau.repository.CategoryRepository;
-import com.codelovers.quanonghau.service.CategoryService;
 import com.codelovers.quanonghau.service.impl.CategoryServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

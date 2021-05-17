@@ -2,11 +2,11 @@ package com.codelovers.quanonghau.controller;
 
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.controller.output.admin.PagingBill;
-import com.codelovers.quanonghau.entity.Bill;
-import com.codelovers.quanonghau.entity.CartItem;
-import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.models.Bill;
+import com.codelovers.quanonghau.models.CartItem;
+import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.exception.BillNotFoundException;
-import com.codelovers.quanonghau.security.CustomUserDetails;
+import com.codelovers.quanonghau.configs.CustomUserDetails;
 import com.codelovers.quanonghau.service.BillService;
 import com.codelovers.quanonghau.service.CartItemService;
 import org.springframework.beans.factory.annotation.Autowired;

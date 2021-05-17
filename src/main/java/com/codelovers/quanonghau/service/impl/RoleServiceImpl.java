@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.service.impl;
 
-import com.codelovers.quanonghau.entity.Role;
+import com.codelovers.quanonghau.models.Role;
 import com.codelovers.quanonghau.repository.RoleRepository;
 import com.codelovers.quanonghau.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;

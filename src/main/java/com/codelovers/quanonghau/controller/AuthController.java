@@ -1,21 +1,19 @@
 package com.codelovers.quanonghau.controller;
 
 import com.codelovers.quanonghau.contrants.Contrants;
-import com.codelovers.quanonghau.entity.Role;
-import com.codelovers.quanonghau.entity.User;
-import com.codelovers.quanonghau.security.CustomUserDetails;
-import com.codelovers.quanonghau.security.jwt.JwtTokenProvider;
-import com.codelovers.quanonghau.security.payload.LoginRequest;
-import com.codelovers.quanonghau.security.payload.LoginResponse;
-import com.codelovers.quanonghau.security.payload.SignupRequest;
+import com.codelovers.quanonghau.models.User;
+import com.codelovers.quanonghau.configs.CustomUserDetails;
+import com.codelovers.quanonghau.configs.jwt.JwtTokenProvider;
+import com.codelovers.quanonghau.configs.payload.LoginRequest;
+import com.codelovers.quanonghau.configs.payload.LoginResponse;
+import com.codelovers.quanonghau.configs.payload.SignupRequest;
 import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
-import com.codelovers.quanonghau.util.MailUtil;
+import com.codelovers.quanonghau.utils.MailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,9 +27,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController

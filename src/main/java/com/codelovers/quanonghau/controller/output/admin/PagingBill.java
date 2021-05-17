@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.controller.output.admin;
 
-import com.codelovers.quanonghau.entity.Bill;
+import com.codelovers.quanonghau.models.Bill;
 import lombok.Data;
 
 import java.util.ArrayList;

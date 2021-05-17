@@ -1,8 +1,8 @@
 package com.codelovers.quanonghau.service.impl;
 
-import com.codelovers.quanonghau.entity.CartItem;
-import com.codelovers.quanonghau.entity.Product;
-import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.models.CartItem;
+import com.codelovers.quanonghau.models.Product;
+import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.repository.CartItemRepository;
 import com.codelovers.quanonghau.repository.ProductRepository;
 import com.codelovers.quanonghau.repository.UserRepository;

@@ -1,9 +1,8 @@
 package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.contrants.Contrants;
-import com.codelovers.quanonghau.entity.Product;
+import com.codelovers.quanonghau.models.Product;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
-import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.repository.ProductRepository;
 import com.codelovers.quanonghau.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,8 @@
 package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.contrants.Contrants;
-import com.codelovers.quanonghau.entity.Bill;
-import com.codelovers.quanonghau.entity.CartItem;
-import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.models.Bill;
+import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.exception.BillNotFoundException;
 import com.codelovers.quanonghau.repository.BillRepository;
 import com.codelovers.quanonghau.repository.CartItemRepository;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

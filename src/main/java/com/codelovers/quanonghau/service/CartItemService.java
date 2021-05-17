@@ -1,7 +1,7 @@
 package com.codelovers.quanonghau.service;
 
-import com.codelovers.quanonghau.entity.CartItem;
-import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.models.CartItem;
+import com.codelovers.quanonghau.models.User;
 
 import java.util.List;
 

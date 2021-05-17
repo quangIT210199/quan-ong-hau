@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.service;
 
-import com.codelovers.quanonghau.entity.Bill;
+import com.codelovers.quanonghau.models.Bill;
 import com.codelovers.quanonghau.exception.BillNotFoundException;
 import org.springframework.data.domain.Page;
 

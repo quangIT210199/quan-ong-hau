@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.controller.output.user;
 
-import com.codelovers.quanonghau.entity.Product;
+import com.codelovers.quanonghau.models.Product;
 import lombok.Data;
 
 import java.util.ArrayList;

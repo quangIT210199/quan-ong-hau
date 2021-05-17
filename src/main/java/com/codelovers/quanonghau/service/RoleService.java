@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.service;
 
-import com.codelovers.quanonghau.entity.Role;
+import com.codelovers.quanonghau.models.Role;
 
 import java.util.List;
 

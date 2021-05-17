@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.ProductUserTest;
 
-import com.codelovers.quanonghau.entity.Product;
+import com.codelovers.quanonghau.models.Product;
 import com.codelovers.quanonghau.repository.ProductRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

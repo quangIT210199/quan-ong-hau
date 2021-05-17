@@ -1,7 +1,7 @@
 package com.codelovers.quanonghau.ProductRepositoryTest;
 
-import com.codelovers.quanonghau.entity.Category;
-import com.codelovers.quanonghau.entity.Product;
+import com.codelovers.quanonghau.models.Category;
+import com.codelovers.quanonghau.models.Product;
 import com.codelovers.quanonghau.repository.ProductRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ public class ProductRepositoryTest {
     private ProductRepository productRepo;
 
     @Autowired
-    private TestEntityManager entityManager; // Sử dụng thao tác vs các entity
+    private TestEntityManager entityManager; // Sử dụng thao tác vs các models
 
     @Test // Add product
     public void testCreatedProduct() {

@@ -1,7 +1,7 @@
 package com.codelovers.quanonghau.dto;
 
-import com.codelovers.quanonghau.entity.Category;
-import com.codelovers.quanonghau.entity.Product;
+import com.codelovers.quanonghau.models.Category;
+import com.codelovers.quanonghau.models.Product;
 import lombok.Data;
 
 import java.util.List;

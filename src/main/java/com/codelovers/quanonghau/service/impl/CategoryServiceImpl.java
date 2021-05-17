@@ -1,7 +1,7 @@
 package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.contrants.Contrants;
-import com.codelovers.quanonghau.entity.Category;
+import com.codelovers.quanonghau.models.Category;
 import com.codelovers.quanonghau.exception.CategoryNotFoundException;
 import com.codelovers.quanonghau.help.PageInfoCategory;
 import com.codelovers.quanonghau.repository.CategoryRepository;

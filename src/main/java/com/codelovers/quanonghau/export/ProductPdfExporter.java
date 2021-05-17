@@ -1,7 +1,7 @@
 package com.codelovers.quanonghau.export;
 
-import com.codelovers.quanonghau.entity.Product;
-import com.codelovers.quanonghau.util.AbstractExporter;
+import com.codelovers.quanonghau.models.Product;
+import com.codelovers.quanonghau.utils.AbstractExporter;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;

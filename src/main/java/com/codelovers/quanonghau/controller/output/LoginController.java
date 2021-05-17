@@ -1,9 +1,9 @@
 package com.codelovers.quanonghau.controller.output;
 
 import com.codelovers.quanonghau.contrants.Contrants;
-import com.codelovers.quanonghau.security.CustomUserDetails;
-import com.codelovers.quanonghau.security.jwt.JwtTokenProvider;
-import com.codelovers.quanonghau.security.payload.LoginRequest;
+import com.codelovers.quanonghau.configs.CustomUserDetails;
+import com.codelovers.quanonghau.configs.jwt.JwtTokenProvider;
+import com.codelovers.quanonghau.configs.payload.LoginRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;

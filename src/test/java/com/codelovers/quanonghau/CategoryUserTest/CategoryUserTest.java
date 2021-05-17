@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.CategoryUserTest;
 
-import com.codelovers.quanonghau.entity.Category;
+import com.codelovers.quanonghau.models.Category;
 import com.codelovers.quanonghau.repository.CategoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

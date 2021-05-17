@@ -1,9 +1,8 @@
 package com.codelovers.quanonghau.service;
 
-import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;

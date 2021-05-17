@@ -1,22 +1,16 @@
 package com.codelovers.quanonghau.export;
 
-import com.codelovers.quanonghau.entity.Product;
-import com.codelovers.quanonghau.entity.User;
-import com.codelovers.quanonghau.util.AbstractExporter;
+import com.codelovers.quanonghau.models.User;
+import com.codelovers.quanonghau.utils.AbstractExporter;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
-import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Path;
 import java.util.List;
 
 public class UserPdfExporter extends AbstractExporter {

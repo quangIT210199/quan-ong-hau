@@ -1,11 +1,11 @@
 package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.contrants.Contrants;
-import com.codelovers.quanonghau.entity.Role;
-import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.models.Role;
+import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.repository.UserRepository;
-import com.codelovers.quanonghau.security.CustomUserDetails;
+import com.codelovers.quanonghau.configs.CustomUserDetails;
 import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
 import net.bytebuddy.utility.RandomString;

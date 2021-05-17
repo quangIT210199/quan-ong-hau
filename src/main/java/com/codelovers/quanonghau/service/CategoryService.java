@@ -1,6 +1,6 @@
 package com.codelovers.quanonghau.service;
 
-import com.codelovers.quanonghau.entity.Category;
+import com.codelovers.quanonghau.models.Category;
 import com.codelovers.quanonghau.exception.CategoryNotFoundException;
 import com.codelovers.quanonghau.help.PageInfoCategory;
 

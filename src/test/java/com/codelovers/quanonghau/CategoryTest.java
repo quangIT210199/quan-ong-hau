@@ -1,7 +1,7 @@
 package com.codelovers.quanonghau;
 
 
-import com.codelovers.quanonghau.entity.Category;
+import com.codelovers.quanonghau.models.Category;
 import com.codelovers.quanonghau.repository.CategoryRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

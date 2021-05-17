@@ -1,9 +1,9 @@
 package com.codelovers.quanonghau.help;
 
-import com.codelovers.quanonghau.entity.Product;
-import com.codelovers.quanonghau.entity.ProductImage;
-import com.codelovers.quanonghau.util.FileUploadUtil;
-import com.codelovers.quanonghau.util.QRCodeGenerator;
+import com.codelovers.quanonghau.models.Product;
+import com.codelovers.quanonghau.models.ProductImage;
+import com.codelovers.quanonghau.utils.FileUploadUtil;
+import com.codelovers.quanonghau.utils.QRCodeGenerator;
 import com.google.zxing.WriterException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
