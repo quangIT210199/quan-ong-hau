@@ -2,13 +2,14 @@ package com.codelovers.quanonghau.service;
 
 import com.codelovers.quanonghau.entity.Product;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
+import com.codelovers.quanonghau.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface ProductService {
 
-    Product findById(Integer id);
+    Product findById(Integer id) throws ProductNotFoundException;
 
     Product findByIdAndName(Integer id, String name);
 

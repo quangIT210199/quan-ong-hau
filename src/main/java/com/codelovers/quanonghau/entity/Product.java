@@ -33,10 +33,10 @@ public class Product implements Serializable {
     private boolean inStock;
 
     @Column(name = "created_time")
-    private String createdTime;
+    private Date createdTime;
 
     @Column(name = "updated_time")
-    private String updatedTime;
+    private Date updatedTime;
 
     private boolean enabled;
 
@@ -209,19 +209,19 @@ public class Product implements Serializable {
         this.alias = alias;
     }
 
-    public String getCreatedTime() {
+    public Date getCreatedTime() {
         return createdTime;
     }
 
-    public void setCreatedTime(String createdTime) {
+    public void setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
     }
 
-    public String getUpdatedTime() {
+    public Date getUpdatedTime() {
         return updatedTime;
     }
 
-    public void setUpdatedTime(String updatedTime) {
+    public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
 

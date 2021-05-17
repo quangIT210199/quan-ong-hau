@@ -25,7 +25,6 @@ public class AccountController {
 
     @GetMapping(value = "/account", produces = "application/json")
     public ResponseEntity<?> viewDetail(@AuthenticationPrincipal CustomUserDetails loggerUser) {
-
         String email = loggerUser.getUsername();
 
         User user = userSer.getUserByEmail(email);
@@ -39,7 +38,6 @@ public class AccountController {
     @PostMapping(value = "/account/updateInfo", produces = "application/json")
     public ResponseEntity<?> saveDetail(User user, @RequestParam(name = "imageFile") MultipartFile file,
                                         @AuthenticationPrincipal CustomUserDetails loggerUser) throws IOException {
-
         if (!file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
@@ -74,6 +72,6 @@ public class AccountController {
             userSer.changePassword(loggerUser.getUser(), password.getNewPassword());
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("Update password success", HttpStatus.OK);
     }
 }

@@ -3,6 +3,7 @@ package com.codelovers.quanonghau.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -19,11 +20,11 @@ public class Bill implements Serializable {
     @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
     List<CartItem> cartItems = new ArrayList<>();
 
-    @Column(name = "creadted_time")
-    private String creadtedTime;
+    @Column(name = "create_time")
+    private Date createTime;
 
-    @Column(name = "status")
-    private String status;
+    @Column(name = "enabled")
+    private boolean enabled;
 
     public Bill() {
     }
@@ -44,19 +45,19 @@ public class Bill implements Serializable {
         this.cartItems = cartItems;
     }
 
-    public String getCreadtedTime() {
-        return creadtedTime;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setCreadtedTime(String creadtedTime) {
-        this.creadtedTime = creadtedTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
-    public String getStatus() {
-        return status;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

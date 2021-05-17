@@ -3,6 +3,7 @@ package com.codelovers.quanonghau.service.impl;
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.entity.Product;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
+import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.repository.ProductRepository;
 import com.codelovers.quanonghau.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -24,8 +26,12 @@ public class ProductServiceImpl implements ProductService {
     ProductRepository productRepo;
 
     @Override
-    public Product findById(Integer id) {
-        return productRepo.findById(id).orElse(null);
+    public Product findById(Integer id) throws ProductNotFoundException {
+        try {
+            return productRepo.findById(id).get();
+        } catch (NoSuchElementException ex) {
+            throw new ProductNotFoundException("Coudl not found user with id: " + id);
+        }
     }
 
     @Override
@@ -65,6 +71,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product saveProduct(Product product) {
+        if (product.getId() == null) {
+            product.setCreatedTime(new Date());
+        }
+
+        if (product.getAlias() == null || product.getAlias().isEmpty()) {
+            String defaultAlias = product.getName().replace(" ", "-");
+            product.setAlias(defaultAlias);
+        } else {
+            product.setAlias(product.getAlias().replace(" ", "-"));
+        }
+
+        product.setUpdatedTime(new Date());
+
         return productRepo.save(product);
     }
 

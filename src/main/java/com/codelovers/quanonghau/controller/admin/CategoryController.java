@@ -43,12 +43,12 @@ public class CategoryController {
     }
     // For Test
 
-    @GetMapping(value = "/category/categories/firstPage", produces = "application/json")
+    @GetMapping(value = "/category/firstPage", produces = "application/json")
     public ResponseEntity<?> listFirstPage(@RequestParam(value = "sortDir") String sortDir) {
         return listByPage(1, sortDir, null);
     }
 
-    @GetMapping(value = "/category/categories/page", produces = "application/json")
+    @GetMapping(value = "/category/page", produces = "application/json")
     public ResponseEntity<?> listByPage(@RequestParam(value = "pageNum") Integer pageNum,
                                         @RequestParam(value = "sortDir") String sortDir,
                                         @RequestParam(value = "keyword") String keyword) { //keyword search by name Cate
@@ -137,8 +137,8 @@ public class CategoryController {
     }
 
     @PostMapping(value = "/category/check_unique", produces = "application/json")
-    public ResponseEntity<?> checkUniqueCategories(@Param(value = "id") Integer id, @Param(value = "name") String name,
-                                                   @Param(value = "alias") String alias) {
+    public ResponseEntity<?> checkUniqueCategories(@RequestParam(value = "id") Integer id, @RequestParam(value = "name") String name,
+                                                   @RequestParam(value = "alias") String alias) {
         String result = categorySer.checkUnique(id, name, alias);
 
         return new ResponseEntity<>(result, HttpStatus.OK);

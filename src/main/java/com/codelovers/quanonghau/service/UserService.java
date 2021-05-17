@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface UserService {
 
-    User findById(Integer id);
+    User findById(Integer id) throws UserNotFoundException;
 
     List<User> listAll();
 

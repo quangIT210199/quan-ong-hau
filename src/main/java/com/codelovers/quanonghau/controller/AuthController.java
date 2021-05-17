@@ -92,14 +92,6 @@ public class AuthController {
         }
 
         User user = new User(signupRequest.getEmail(), signupRequest.getPassword(), signupRequest.getFirstName(), signupRequest.getLastName());
-
-        Set<Role> roles = new HashSet<>();
-
-        Role userRole = roleSer.findByName(Contrants.USER);
-        roles.add(userRole);
-
-        user.setRoles(roles);
-        user.setEnabled(true);
         userSer.registerUser(user);
 
         System.out.println("Verify Code: " + user.getVerificationCode());

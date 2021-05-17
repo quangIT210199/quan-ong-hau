@@ -1,10 +1,12 @@
 package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.contrants.Contrants;
+import com.codelovers.quanonghau.entity.Role;
 import com.codelovers.quanonghau.entity.User;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.repository.UserRepository;
 import com.codelovers.quanonghau.security.CustomUserDetails;
+import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,22 +20,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional // Because we using query update/delete in Repository
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    UserRepository userRepo;
+    private UserRepository userRepo;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private RoleService roleSer;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
-    public User findById(Integer id) {
-
-        return userRepo.findById(id).orElse(null);
+    public User findById(Integer id) throws UserNotFoundException {
+        try {
+            return userRepo.findById(id).get();
+        } catch (NoSuchElementException ex){
+            throw new UserNotFoundException("Could not found user with id: " + id);
+        }
     }
 
     @Override
@@ -130,8 +138,10 @@ public class UserServiceImpl implements UserService {
                 encodePassword(user);
             }
 
+            user.setUpdateTime(new Date());
         } else {
             encodePassword(user);
+            user.setCreateTime(new Date());
         }
 
         return userRepo.save(user);
@@ -182,8 +192,16 @@ public class UserServiceImpl implements UserService {
     /////////////////// THIS method using for USER like Customer
     @Override
     public void registerUser(User user) {
+        Set<Role> roles = new HashSet<>();
+
+        Role userRole = roleSer.findByName(Contrants.USER);
+        roles.add(userRole);
+
+        user.setRoles(roles);
+
         encodePassword(user);
         user.setEnabled(false);
+        user.setCreateTime(new Date());
 
         String randomCode = RandomString.make(64);
         user.setVerificationCode(randomCode);

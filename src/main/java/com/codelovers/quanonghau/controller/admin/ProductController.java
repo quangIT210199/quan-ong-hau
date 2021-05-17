@@ -7,6 +7,7 @@ import com.codelovers.quanonghau.dto.NewProductDTO;
 import com.codelovers.quanonghau.entity.Category;
 import com.codelovers.quanonghau.entity.Product;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
+import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.export.ProductPdfExporter;
 import com.codelovers.quanonghau.help.ProductSaveHelper;
 import com.codelovers.quanonghau.service.CategoryService;
@@ -94,6 +95,9 @@ public class ProductController {
         List<Category> categoryList = categorySer.listAll();
 
         Product product = new Product();
+        product.setEnabled(true);
+        product.setInStock(true);
+
         NewProductDTO newProductDTO = new NewProductDTO(product, categoryList);
 
         return new ResponseEntity<>(newProductDTO, HttpStatus.OK);
@@ -169,16 +173,17 @@ public class ProductController {
 
     @GetMapping(value = "/product/{id}/enabled/{status}", produces = "application/json")
     public ResponseEntity<?> updateProductEnabledStatus(@PathVariable(name = "id") Integer id, @PathVariable(name = "status") boolean enabled) {
-        Product product = productSer.findById(id);
-        if (product == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            Product product = productSer.findById(id);
+
+            productSer.updateProductEnableStatus(id, enabled);
+
+            String result = enabled ? "enabled" : "disabled";
+
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (ProductNotFoundException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
-
-        productSer.updateProductEnableStatus(id, enabled);
-
-        String result = enabled ? "enabled" : "disabled";
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping(value = "/product/delete", produces = "application/json")
@@ -194,30 +199,30 @@ public class ProductController {
             FileUploadUtil.removeDir(productExtraImagesDir);
             FileUploadUtil.removeDir(productImagesDir);
 
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>("Delete success", HttpStatus.OK);
         } catch (ProductNotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping(value = "/product/check_unique", produces = "application/json")
-    public String checkUnique(@Param(value = "id") Integer id, @Param(value = "name") String name) {
-        return productSer.checkUnique(id, name);
+    public ResponseEntity<?> checkUnique(@RequestParam(value = "id") Integer id, @RequestParam(value = "name") String name) {
+        return new ResponseEntity<>(productSer.checkUnique(id, name), HttpStatus.OK);
     }
 
     /*PDF*/
     @GetMapping("/product/exportQR/pdf/{id}")
     public ResponseEntity<?> exportQRCodeToPDF(HttpServletResponse response, @PathVariable(name = "id") Integer id) throws IOException {
+        try {
+            Product product = productSer.findById(id);
 
-        Product product = productSer.findById(id);
-        if (product == null || product.getQrCodeImage() == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            ProductPdfExporter exporter = new ProductPdfExporter();
+            exporter.exportQRCode(product, response);
+
+            return new ResponseEntity<>("Done", HttpStatus.OK);
+        } catch (ProductNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
 
-        ProductPdfExporter exporter = new ProductPdfExporter();
-        exporter.exportQRCode(product, response);
-
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -3,6 +3,8 @@ package com.codelovers.quanonghau.controller;
 import com.codelovers.quanonghau.entity.CartItem;
 import com.codelovers.quanonghau.entity.Product;
 import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.exception.ProductNotFoundException;
+import com.codelovers.quanonghau.exception.UserNotFoundException;
 import com.codelovers.quanonghau.security.CustomUserDetails;
 import com.codelovers.quanonghau.service.CartItemService;
 import com.codelovers.quanonghau.service.ProductService;
@@ -58,19 +60,19 @@ public class ShoppingCartRestController {
 //            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 //        }
         if (customUserDetails == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        try {
+            User user = customUserDetails.getUser();
 
-        User user = customUserDetails.getUser();
+            Product product = productSer.findById(pid);
 
-        Product product = productSer.findById(pid);
-        if (product == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            Integer addedQuantity = cartItemSer.addProduct(pid, qty, user);
+
+            return new ResponseEntity<>(addedQuantity, HttpStatus.OK);
+        } catch (ProductNotFoundException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
-
-        Integer addedQuantity = cartItemSer.addProduct(pid, qty, user);
-
-        return new ResponseEntity<>(addedQuantity, HttpStatus.OK);
     }
 
     // Fix code, beacase value uid dont need when code authen : /cart/update/{pid}/{qty}
@@ -85,14 +87,15 @@ public class ShoppingCartRestController {
 
         User user = customUserDetails.getUser();
 
-        Product product = productSer.findById(pid);
-        if (product == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            Product product = productSer.findById(pid);
+        } catch (ProductNotFoundException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
 
         CartItem c = cartItemSer.exitBillId(pid, user);
         if (c == null) { // Product is in Bill
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         float subTotal = cartItemSer.updateQuantity(qty, pid, user);
@@ -101,22 +104,24 @@ public class ShoppingCartRestController {
     }
 
     // Fix code, beacase value uid dont need when code authen : /cart/update/{pid}
-    @DeleteMapping(value = "/cart/remove/{pid}", produces = "application/json")
+    @GetMapping(value = "/cart/remove/{pid}", produces = "application/json")
     public ResponseEntity<?> removeProductFromCart(@PathVariable(name = "pid") Integer pid, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         if (customUserDetails == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        User user = customUserDetails.getUser();
+        try {
+            User user = customUserDetails.getUser();
 
-        Product product = productSer.findById(pid);
-        if (product == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            Product product = productSer.findById(pid);
+
+            cartItemSer.removeProductAndUser(pid, user);
+            return new ResponseEntity<>("Delete succsess", HttpStatus.OK);
+        } catch (ProductNotFoundException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
 
-        cartItemSer.removeProductAndUser(pid, user);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
 

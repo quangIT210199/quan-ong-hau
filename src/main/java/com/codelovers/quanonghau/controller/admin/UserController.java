@@ -77,13 +77,13 @@ public class UserController {
 
     @GetMapping(value = "/user", produces = "application/json")
     public ResponseEntity<?> getUserById(@RequestParam("id") Integer id) {
-        User user = userSer.findById(id);
-        System.out.println("Path: " + user.getPhotosImagePath());
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        try {
+            User user = userSer.findById(id);
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     // Get information for form Create User
@@ -174,23 +174,23 @@ public class UserController {
     // Get user information for edit form for USER , need code DTO for send Object json
     @GetMapping(value = "/user/edit/{id}", produces = "application/json")
     public ResponseEntity<?> editUser(@PathVariable(name = "id") Integer id) {
-        User user = userSer.findById(id);
+        try {
+            User user = userSer.findById(id);
 
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            List<Role> listRole = roleSer.listRole();
+
+            Set<Role> roles = new HashSet<>();
+
+            for (Role role : listRole) {
+                roles.add(role);
+            }
+
+            user.setRoles(roles);
+
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-
-        List<Role> listRole = roleSer.listRole();
-
-        Set<Role> roles = new HashSet<>();
-
-        for (Role role : listRole) {
-            roles.add(role);
-        }
-
-        user.setRoles(roles);
-
-        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping(value = "/user/delete/{id}", produces = "application/json")
@@ -203,27 +203,28 @@ public class UserController {
             FileUploadUtil.removeDir(userDir);
             return new ResponseEntity<>("Delete done" + id, HttpStatus.NO_CONTENT);
         } catch (UserNotFoundException ex) {
-            System.out.println(ex.getMessage());
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping(value = "/user/{id}/enabled/{status}", produces = "application/json")
     public ResponseEntity<?> updateUserEnabledStatus(@PathVariable("id") Integer id,
-                                                     @PathVariable("status") boolean enabled) {
-        User user = userSer.findById(id);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                                                         @PathVariable("status") boolean enabled) {
+        try {
+            User user = userSer.findById(id);
+
+            userSer.updateUserEnabledStatus(id, enabled);
+
+            String status = enabled ? "enabled" : "disabled";
+
+            return new ResponseEntity<>(status, HttpStatus.OK);
+        } catch (UserNotFoundException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
-        userSer.updateUserEnabledStatus(id, enabled);
-
-        String status = enabled ? "enabled" : "disabled";
-
-        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
     @PostMapping(value = "/user/check_email", produces = "application/json")
-    public ResponseEntity<?> checkDuplicateEmail(@Param("id") Integer id, @Param("email") String email) {
+    public ResponseEntity<?> checkDuplicateEmail(@RequestParam("id") Integer id, @RequestParam("email") String email) {
 
         String result = userSer.isEmailUnique(id, email) ? "OK" : "Duplicated";
 

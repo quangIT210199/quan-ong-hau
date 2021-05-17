@@ -1,17 +1,26 @@
 package com.codelovers.quanonghau.service.impl;
 
+import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.entity.Bill;
 import com.codelovers.quanonghau.entity.CartItem;
 import com.codelovers.quanonghau.entity.User;
+import com.codelovers.quanonghau.exception.BillNotFoundException;
 import com.codelovers.quanonghau.repository.BillRepository;
 import com.codelovers.quanonghau.repository.CartItemRepository;
 import com.codelovers.quanonghau.repository.UserRepository;
 import com.codelovers.quanonghau.service.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -29,10 +38,11 @@ public class BillServiceImpl implements BillService {
     UserRepository userRepo;
 
     @Override
-    public Bill createBill(Bill bill) { // Khi bấm checkout tạo 1 Bill và add ID vào hết các CartItem k có billID
-        Bill b = billRepo.save(bill);
+    public Bill createBill(Bill bill) throws ParseException { // Khi bấm checkout tạo 1 Bill và add ID vào hết các CartItem k có billID
+        bill.setCreateTime(new Date());
+        bill.setEnabled(true);
 
-        return b;
+        return billRepo.save(bill);
     }
 
     @Override
@@ -41,10 +51,14 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public void removeBill(Integer bid) {
-        Bill bill = billRepo.findById(bid).orElse(null);
+    public void removeBill(Integer bid) throws BillNotFoundException {
+        Long count = billRepo.countById(bid);
 
-        billRepo.delete(bill);
+        if (count == 0 || count == null) {
+            throw new BillNotFoundException("Could not found bill with id: " + bid);
+        }
+
+        billRepo.deleteById(bid);
     }
 
     @Override
@@ -66,5 +80,20 @@ public class BillServiceImpl implements BillService {
         }
 
         return listBill;
+    }
+
+    @Override
+    public Page<Bill> listByPage(int pageNum, String sortDir) {
+        Sort sort = null;
+        sort = sortDir.equals("acs") ? sort.ascending() : sort.descending();
+
+        Pageable pageable = PageRequest.of(pageNum - 1, Contrants.BILL_PER_PAGE, sort);
+
+        return billRepo.findAll(pageable);
+    }
+
+    @Override
+    public void updateBillEnableStatus(Integer id, boolean enabled) {
+        billRepo.updateBillEnabledStatus(id, enabled);
     }
 }

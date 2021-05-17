@@ -1,6 +1,5 @@
 package com.codelovers.quanonghau.service.impl;
 
-import com.codelovers.quanonghau.entity.Bill;
 import com.codelovers.quanonghau.entity.CartItem;
 import com.codelovers.quanonghau.entity.Product;
 import com.codelovers.quanonghau.entity.User;
@@ -33,7 +32,7 @@ public class CartItemServiceImpl implements CartItemService {
         int id = user.getId();
 
         // Cần check xem các Cart_item nào đã vào Bill chưa
-        List<CartItem> cartItems = cartItemRepo.findAllByUser_Id(id);
+        List<CartItem> cartItems = cartItemRepo.findAllByUserId(id);
 //        for (CartItem cartItem: cartItems){
 //            if(cartItem.getBill() != null){ // Đã tồn tại ở bill khác rồi
 //                cartItems.remove(cartItem);

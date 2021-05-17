@@ -14,6 +14,8 @@ public class Contrants {
 
     public static final int ROOT_CATEGORIES_PER_PAGE = 5;
 
+    public static final int BILL_PER_PAGE = 5;
+
     ///////////////////// FOR MAIL
     public static final String MAIL_FROM = "truongnv2026@gmail.com";
 

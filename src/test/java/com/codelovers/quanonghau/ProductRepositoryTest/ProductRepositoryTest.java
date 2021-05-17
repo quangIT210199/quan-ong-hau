@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.annotation.Rollback;
 
+import java.util.Date;
 import java.util.Optional;
 
 @DataJpaTest
@@ -36,8 +37,8 @@ public class ProductRepositoryTest {
         product.setAlias("Cake3");
         product.setFullDescription("Ngon");
         product.setShortDescription("Ngon");
-        product.setCreatedTime("21/01/1999");
-        product.setUpdatedTime("31/12/2000");
+        product.setCreatedTime(new Date());
+        product.setUpdatedTime(new Date());
         product.setCost(200);
         product.setPrice(300);
         product.setDiscountPercent(20);
