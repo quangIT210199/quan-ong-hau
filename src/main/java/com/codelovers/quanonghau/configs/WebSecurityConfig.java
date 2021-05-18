@@ -1,6 +1,7 @@
 package com.codelovers.quanonghau.configs;
 
 import com.codelovers.quanonghau.configs.jwt.JwtAuthenticationFilter;
+import com.codelovers.quanonghau.configs.jwt.JwtAuthorityEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -23,6 +25,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
+
+    @Autowired
+    private JwtAuthorityEntryPoint jwtAuthorityEntryPoint;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -72,15 +77,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf()
                 .disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthorityEntryPoint)
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll() // Cho phép tất cả mọi người truy cập vào địa chỉ này
+                .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/signup").permitAll()
                 .antMatchers("/api/products/**").hasRole("ADMIN")
                 .antMatchers("/api/categories/**").hasRole("ADMIN")
                 .antMatchers("/api/users/**").hasRole("ADMIN")
                 .antMatchers("/api/carts/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/api/bills/**").hasRole("ADMIN")
-                .anyRequest().authenticated()// Tất cả các request khác đều cần phải xác thực mới được truy cập
+                .anyRequest().authenticated()
                 .and()
                 .logout()
                 .permitAll();

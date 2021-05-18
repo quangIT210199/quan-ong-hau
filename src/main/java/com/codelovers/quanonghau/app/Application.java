@@ -9,7 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-@SpringBootApplication
+//@SpringBootApplication
 public class Application {
 	private static final long THREAD_SLEEP_TIME = 1000/12;
 	private static boolean running = true;
