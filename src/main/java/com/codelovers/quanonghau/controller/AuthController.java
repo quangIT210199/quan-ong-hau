@@ -103,8 +103,8 @@ public class AuthController {
         String subject = Contrants.USER_VERIFY_SUBJECT;
         String content = Contrants.USER_VERIFY_CONTENT;
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper help = new MimeMessageHelper(message);
+        MimeMessage message = mailSender.createMimeMessage(); // interface to create MIME
+        MimeMessageHelper help = new MimeMessageHelper(message); // a class support create MIME with image,audio or html
 
         help.setFrom(Contrants.MAIL_FROM, Contrants.MAIL_SENDER_NAME);
         help.setTo(toAddress);
@@ -112,7 +112,7 @@ public class AuthController {
 
         content = content.replace("[[name]]", user.getFullName());
 
-        String verifyURL = MailUtil.getSiteURL(request) + "/verify?code=" + user.getVerificationCode();
+        String verifyURL = MailUtil.getSiteURL(request, "/create_user") + "/verify?code=" + user.getVerificationCode();
         System.out.println(verifyURL);
         content = content.replace("[[URL]]", verifyURL);
 

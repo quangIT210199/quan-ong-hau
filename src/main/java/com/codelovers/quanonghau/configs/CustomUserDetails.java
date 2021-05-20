@@ -26,7 +26,6 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<Role> roles = user.getRoles();
-        System.out.println("Vao day Custom");
         List<SimpleGrantedAuthority> authories = new ArrayList<>();
 
         for (Role role : roles) {

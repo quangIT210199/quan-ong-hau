@@ -35,8 +35,11 @@ public interface UserService {
 
     User updateAccount(User userInForm);
 
-    ////// THIS method using for USER like Customer
+    ////// This method using for USER like Customer
     void registerUser(User user);
 
     boolean verifyCode(String verificationCode);
+
+    // Using for Oauth2
+    void updateAuthenticationType(User user, AuthenticationType authenticationType);
 }

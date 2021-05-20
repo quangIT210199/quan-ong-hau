@@ -22,9 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
     @Autowired
-    private UserDetailsServiceImpl userDetailsServiceImpl;
+    private UserDetailsServiceImpl userDetailsServiceImpl; // Get data user in DataBase
 
     @Autowired
     private JwtAuthorityEntryPoint jwtAuthorityEntryPoint;
@@ -55,46 +54,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-//        http
-//                .cors()
-//                .and()
-//                .csrf()
-//                .disable()
-//                .authorizeRequests()//// dont authenticate this particular request
-//                .antMatchers("/api/login").permitAll()
-//                .antMatchers("/api/v1/carts/**").hasAnyAuthority("USER","ADMIN")
-//                .antMatchers("/api/v1/bills/**").hasRole("ADMIN")
-//                .anyRequest().authenticated()//// all other requests need to be authenticated
-//                .and()
-//                .logout().permitAll();
-//
-//        // ADD Class filter to check JWT
-//        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-//                // this disables session creation on Spring Security
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http
-                .cors() // Ngăn chặn request từ một domain khác
+                    .cors() // Ngăn chặn request từ một domain khác
                 .and()
-                .csrf()
-                .disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthorityEntryPoint)
+                    .csrf()
+                    .disable()
+                    .exceptionHandling()
+                    .authenticationEntryPoint(jwtAuthorityEntryPoint)
                 .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/api/signup").permitAll()
-                .antMatchers("/api/products/**").hasRole("ADMIN")
-                .antMatchers("/api/categories/**").hasRole("ADMIN")
-                .antMatchers("/api/users/**").hasRole("ADMIN")
-                .antMatchers("/api/carts/**").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/api/bills/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
+                    .authorizeRequests()
+                    .antMatchers("/api/auth/**").permitAll()
+                    .antMatchers("/api/signup").permitAll()
+                    .antMatchers("/api/products/**").hasRole("ADMIN")
+                    .antMatchers("/api/categories/**").hasRole("ADMIN")
+                    .antMatchers("/api/users/**").hasRole("ADMIN")
+                    .antMatchers("/api/carts/**").hasAnyRole("USER", "ADMIN")
+                    .antMatchers("/api/bills/**").hasRole("ADMIN")
+                    .anyRequest().authenticated()
                 .and()
-                .logout()
-                .permitAll();
+                    .logout()
+                    .permitAll();
 //                .formLogin()
 //                .loginPage("/login")
 //                .loginProcessingUrl("/login_page")
@@ -111,6 +93,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // make sure we use stateless session; session won't be used to
         // store user's state.
+        // And // this disables session creation on Spring Security
 //        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 //                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }

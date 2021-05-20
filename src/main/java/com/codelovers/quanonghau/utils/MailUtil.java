@@ -8,10 +8,10 @@ import java.util.Properties;
 
 public class MailUtil {
 
-    public  static String getSiteURL(HttpServletRequest request) {
+    public  static String getSiteURL(HttpServletRequest request, String path) {
         String siteURL = request.getRequestURL().toString();
         System.out.println("get Servlet Path " + request.getServletPath());
-        return siteURL.replace("/create_user", "");
+        return siteURL.replace(path, "");
     }
 
     public static JavaMailSenderImpl prepareMailSender() {

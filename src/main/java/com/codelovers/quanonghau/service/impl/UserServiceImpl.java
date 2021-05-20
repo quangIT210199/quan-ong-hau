@@ -221,4 +221,12 @@ public class UserServiceImpl implements UserService {
             return true;
         }
     }
+
+    // Using for Oauth2
+    @Override
+    public void updateAuthenticationType(User user, AuthenticationType authenticationType) {
+        if (!user.getAuthenticationType().equals(authenticationType)) {
+            userRepo.updateAuthenticationType(user.getId(), authenticationType);
+        }
+    }
 }
