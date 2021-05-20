@@ -82,13 +82,13 @@ public class BillRestController {
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        // Làm authen để xác định user
+
         List<Bill> listBill = billSer.findAllBillByUserId(user.getId());
 
         return new ResponseEntity<>(listBill, HttpStatus.OK);
     }
 
-    // Tạo Bill khi click btn CheckOut và gán billId cho các sp trong giỏ hàng
+    // Create Bill when use click checkout
     @PostMapping(value = "/bill", produces = "application/json")
     public ResponseEntity<?> createBill(@RequestBody Integer[] cartIds,
                                         @AuthenticationPrincipal CustomUserDetails loggedUser) throws ParseException {
@@ -97,10 +97,9 @@ public class BillRestController {
         if (cartIds.length - 1 < 0) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        // Cần check User của giỏ hàng đó thì các CartItem tồn tại BillId chưa
-        // Cần làm thêm authen để tìm kiếm cùng user định danh giỏ hàng của user nào
+
         for (Integer c : cartIds) {
-            // Check CartItem có Bill chưa để CreateBill
+            // Check CartItem have bill yet for create Bill
             CartItem cartItem = cartItemSer.findByIdAndUser(c, user.getId());
             if (cartItem.getBill() != null) {
                 return new ResponseEntity<>("Khong hợp lệ", HttpStatus.NO_CONTENT);
@@ -108,12 +107,11 @@ public class BillRestController {
         }
 
         Bill b = new Bill();
-        // Tạo bill vào set cho các CartItem BillId
         Bill bill = billSer.createBill(b);
 
         Integer billId = bill.getId();
         System.out.println("ID của Bill: " + billId);
-        //Xét billId vào CardItem
+        // Set billId in CardItem
         cartItemSer.updateBillId(billId, cartIds);
 
         return new ResponseEntity<>("Tạo Bill thành công!", HttpStatus.OK);
@@ -131,6 +129,7 @@ public class BillRestController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping(value = "/bill/{id}/status/{enabled}", produces = "application/json")
         public ResponseEntity<?> updateBillEnabledStatus(@PathVariable(name = "id") Integer id,
                                                          @PathVariable(name = "enabled") boolean enabled) {

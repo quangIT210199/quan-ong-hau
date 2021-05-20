@@ -55,7 +55,7 @@ public class Product implements Serializable {
     @Column(name = "qr_code_image")
     private String qrCodeImage;
 
-    // orphanRemoval: Mối đối tượng company sẽ chứa 1 tập hợp các đối tượng employee, khi một đối tượng employee bị xóa khỏi tập hợp đó thì nó sẽ bị xóa khỏi database.
+    // orphanRemoval: là một đặc tả trong ORM. Nó đánh dấu rằng các phần tử con sẽ bị xóa khi bạn xóa nó khỏi collection của phần tử cha.
     // CascadeType.ALL: bất cứ sự thay đổi với parent(Product) sẽ update chile(ProductImage)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductImage> images = new HashSet<>();
