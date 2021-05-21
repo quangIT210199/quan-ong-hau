@@ -1,9 +1,11 @@
 package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.contrants.Contrants;
+import com.codelovers.quanonghau.models.PasswordResetToken;
 import com.codelovers.quanonghau.models.Role;
 import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
+import com.codelovers.quanonghau.repository.PasswordResetTokenRepository;
 import com.codelovers.quanonghau.repository.UserRepository;
 import com.codelovers.quanonghau.configs.CustomUserDetails;
 import com.codelovers.quanonghau.service.RoleService;
@@ -31,6 +33,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RoleService roleSer;
+
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepo;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -222,11 +227,41 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    // Using for Oauth2
     @Override
-    public void updateAuthenticationType(User user, AuthenticationType authenticationType) {
-        if (!user.getAuthenticationType().equals(authenticationType)) {
-            userRepo.updateAuthenticationType(user.getId(), authenticationType);
-        }
+    public String resetPassword(User user) {
+        String randomPassword = RandomString.make(10);
+        user.setPassword(randomPassword);
+
+        encodePassword(user);
+        userRepo.save(user);
+
+        return randomPassword;
+    }
+
+    /// For Reset Password
+    @Override
+    public void createPasswordResetTokenForUser(String token, User user) {
+        PasswordResetToken passwordResetToken = new PasswordResetToken(token, user);
+        passwordResetToken.setExpiryDate(new Date(System.currentTimeMillis() + Contrants.EXPIRATION_DATE));
+        passwordResetTokenRepo.save(passwordResetToken);
+    }
+
+    @Override
+    public String validatePasswordResetToken(String token) {
+        final PasswordResetToken passToken = passwordResetTokenRepo.findByToken(token);
+
+        return !isTokenExpired(passToken) ? "invalidToken"
+                : isTokenExpired(passToken) ? "expired"
+                : null;
+    }
+
+    private boolean isTokenFound(PasswordResetToken passToken) {
+        return passToken != null;
+    }
+
+    private boolean isTokenExpired(PasswordResetToken passwordResetToken) {
+        final Calendar cal = Calendar.getInstance();
+
+        return passwordResetToken.getExpiryDate().before(cal.getTime());
     }
 }

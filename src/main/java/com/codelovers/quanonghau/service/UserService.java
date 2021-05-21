@@ -40,6 +40,10 @@ public interface UserService {
 
     boolean verifyCode(String verificationCode);
 
-    // Using for Oauth2
-    void updateAuthenticationType(User user, AuthenticationType authenticationType);
+    String resetPassword(User user);
+
+    ///
+    void createPasswordResetTokenForUser(String token, User user);
+
+    String validatePasswordResetToken(String token);
 }

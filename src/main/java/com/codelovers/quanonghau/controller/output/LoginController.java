@@ -4,6 +4,7 @@ import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.configs.CustomUserDetails;
 import com.codelovers.quanonghau.configs.jwt.JwtTokenProvider;
 import com.codelovers.quanonghau.configs.payload.LoginRequest;
+import com.codelovers.quanonghau.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class LoginController {
+
+    @Autowired
+    private UserService userSer;
 
     @Autowired
     private AuthenticationManager authenticationManager; // Storegare and get authorites in here
@@ -72,7 +77,7 @@ public class LoginController {
 
         model.addAttribute("jwt", token);
 
-        return "quang";
+        return "password-reset";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -97,5 +102,21 @@ public class LoginController {
         response.addCookie(cookie);
 
         return "redirect:home";
+    }
+
+    @RequestMapping(value = "/forgot_pass", method = RequestMethod.GET)
+    public String getView(@RequestParam(name = "token") String token, Model model) {
+
+        String result = userSer.validatePasswordResetToken(token);
+//        if(result != null) {
+//            String message = messages.getMessage("auth.message." + result, null, locale);
+//            return "redirect:/login.html?lang="
+//                    + locale.getLanguage() + "&message=" + message;
+//        } else {
+//            model.addAttribute("token", token);
+//            return "redirect:/updatePassword.html?lang=" + locale.getLanguage();
+//        }
+
+        return "password-reset.html";
     }
 }

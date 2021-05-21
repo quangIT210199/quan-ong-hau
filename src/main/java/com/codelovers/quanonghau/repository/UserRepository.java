@@ -40,9 +40,4 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 
     @Query("SELECT u FROM User u WHERE u.verificationCode = ?1")
     User getUserByVerificationCode(String verificationCode);
-
-    /// Oauth2
-    @Query("UPDATE User u SET u.authenticationType = ?2 WHERE u.id = ?1")
-    @Modifying
-    void updateAuthenticationType(Integer id, AuthenticationType authenticationType);
 }

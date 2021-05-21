@@ -1,6 +1,7 @@
 package com.codelovers.quanonghau.controller;
 
 import com.codelovers.quanonghau.contrants.Contrants;
+import com.codelovers.quanonghau.controller.input.PasswordReset;
 import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.configs.CustomUserDetails;
 import com.codelovers.quanonghau.configs.jwt.JwtTokenProvider;
@@ -10,6 +11,7 @@ import com.codelovers.quanonghau.configs.payload.SignupRequest;
 import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
 import com.codelovers.quanonghau.utils.MailUtil;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -117,7 +119,7 @@ public class AuthController {
         content = content.replace("[[URL]]", verifyURL);
 
         help.setText(content, true);
-
+//        message.setContent(content, "text/html");
         mailSender.send(message);
 
         System.out.println("to Address: " + toAddress);
@@ -132,5 +134,88 @@ public class AuthController {
         String result = verified ? "Congratulations! Your account has been verified." : "Your account was already verified, or the verification code is invalid";
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // Forgot Password API for App
+    @PostMapping(value = "/reset_password", produces = "application/json")
+    public ResponseEntity<?> resetPassword(@RequestBody PasswordReset email) throws UnsupportedEncodingException {
+        User user = userSer.getUserByEmail(email.getEmail());
+        if (user == null) {
+            return new ResponseEntity<>("There were an error", HttpStatus.NOT_FOUND);
+        }
+
+        String newPassword = userSer.resetPassword(user);
+        System.out.println("New Password: " + newPassword);
+        try {
+            sendResetPasswordEMail(newPassword, user);
+            return new ResponseEntity<>("Your password has been reset. Please check your e-mail.",HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("There were an error",HttpStatus.OK);
+        }
+    }
+
+    private void sendResetPasswordEMail(String newPassword, User user) throws UnsupportedEncodingException, MessagingException {
+        JavaMailSenderImpl mailSender = MailUtil.prepareMailSender();
+
+        String toAddress = user.getEmail();
+        String subject = Contrants.RESET_PASSWORD_SUBJECT;
+        String content = Contrants.RESET_PASSWORD_CONTENT;
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        helper.setFrom(Contrants.MAIL_FROM, Contrants.MAIL_SENDER_NAME);
+        helper.setTo(toAddress);
+        helper.setSubject(subject);
+
+        content = content.replace("[[name]]", user.getFullName());
+        content = content.replace("[[newPassword]]", newPassword);
+
+        helper.setText(content, true);
+        mailSender.send(message);
+        System.out.println("to Address: " + toAddress);
+    }
+
+    // Reset Password in web
+    @PostMapping(value = "/password_reset_token", produces = "application/json")
+    public ResponseEntity<?> resetPasswordToken(HttpServletRequest request, @RequestBody PasswordReset email) throws MessagingException, UnsupportedEncodingException {
+        User user = userSer.getUserByEmail(email.getEmail());
+
+        if (user == null) {
+            return new ResponseEntity<>("There were an error", HttpStatus.NOT_FOUND);
+        }
+
+        String token = RandomString.make(64);
+        userSer.createPasswordResetTokenForUser(token, user);
+
+        sendURLPasswordResetToken(request, token, user);
+
+        return new ResponseEntity<>("Your link reset password has been send. Please check your e-mail.",HttpStatus.OK);
+    }
+
+    private void sendURLPasswordResetToken(HttpServletRequest request, String token, User user) throws MessagingException, UnsupportedEncodingException {
+        JavaMailSenderImpl mailSender = MailUtil.prepareMailSender();
+
+        String toAddress = user.getEmail();
+        String subject = Contrants.RESET_PASSWORD_WEB_SUBJECT;
+        String content = Contrants.RESET_PASSWORD_WEB_CONTENT;
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        helper.setFrom(Contrants.MAIL_FROM, Contrants.MAIL_SENDER_NAME);
+        helper.setTo(toAddress);
+        helper.setSubject(subject);
+
+        content = content.replace("[[name]]", user.getFullName());
+
+        String resetURL = MailUtil.getSiteURL(request, "/api/auth/password_reset_token") + "/forgot_pass?token=" + token;
+        content = content.replace("[[URL]]", resetURL);
+
+        helper.setText(content, true);
+        mailSender.send(message);
+
+        System.out.println("to Address: " + toAddress);
+        System.out.println("Reset URL: " + resetURL);
     }
 }
