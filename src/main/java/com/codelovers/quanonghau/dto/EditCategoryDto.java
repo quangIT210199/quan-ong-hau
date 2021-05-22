@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class EditCategoryDTO {
+public class EditCategoryDto {
     private Integer id;
     private Category category;
     private List<Category> listCategory = new ArrayList<>();

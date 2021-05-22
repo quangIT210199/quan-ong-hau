@@ -1,6 +1,7 @@
 package com.codelovers.quanonghau.service.impl;
 
 import com.codelovers.quanonghau.contrants.Contrants;
+import com.codelovers.quanonghau.exception.PasswordResetTokenNotFoundException;
 import com.codelovers.quanonghau.models.PasswordResetToken;
 import com.codelovers.quanonghau.models.Role;
 import com.codelovers.quanonghau.models.User;
@@ -247,12 +248,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByPasswordResetToken(String token) {
+        PasswordResetToken passwordResetToken = passwordResetTokenRepo.findByToken(token);
+
+        return userRepo.findById(passwordResetToken.getUser().getId()).get();
+    }
+
+    @Override
     public String validatePasswordResetToken(String token) {
         final PasswordResetToken passToken = passwordResetTokenRepo.findByToken(token);
 
-        return !isTokenExpired(passToken) ? "invalidToken"
+        return !isTokenFound(passToken) ? "invalidToken"
                 : isTokenExpired(passToken) ? "expired"
                 : null;
+    }
+
+    @Override
+    public void deletePasswordResetToken(String token) throws PasswordResetTokenNotFoundException {
+        PasswordResetToken passwordResetToken = passwordResetTokenRepo.findByToken(token);
+
+        if (passwordResetToken == null) {
+            throw new PasswordResetTokenNotFoundException("Could not find passwordResetToken with id: " + passwordResetToken.getId());
+        }
+
+        passwordResetTokenRepo.delete(passwordResetToken);
     }
 
     private boolean isTokenFound(PasswordResetToken passToken) {

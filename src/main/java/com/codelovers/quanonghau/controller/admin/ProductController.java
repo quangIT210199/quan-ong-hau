@@ -2,8 +2,8 @@ package com.codelovers.quanonghau.controller.admin;
 
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.controller.output.admin.PagingProduct;
-import com.codelovers.quanonghau.dto.EditProductDTO;
-import com.codelovers.quanonghau.dto.NewProductDTO;
+import com.codelovers.quanonghau.dto.EditProductDto;
+import com.codelovers.quanonghau.dto.NewProductDto;
 import com.codelovers.quanonghau.models.Category;
 import com.codelovers.quanonghau.models.Product;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
@@ -96,7 +96,7 @@ public class ProductController {
         product.setEnabled(true);
         product.setInStock(true);
 
-        NewProductDTO newProductDTO = new NewProductDTO(product, categoryList);
+        NewProductDto newProductDTO = new NewProductDto(product, categoryList);
 
         return new ResponseEntity<>(newProductDTO, HttpStatus.OK);
     }
@@ -158,7 +158,7 @@ public class ProductController {
             List<Category> categoryList = categorySer.listAll();
             Integer numberOfExistingExtraImages = product.getImages().size();
 
-            EditProductDTO editProductDTO = new EditProductDTO();
+            EditProductDto editProductDTO = new EditProductDto();
             editProductDTO.setProduct(product);
             editProductDTO.setCategoryList(categoryList);
             editProductDTO.setNumberOfExistingExtraImages(numberOfExistingExtraImages);

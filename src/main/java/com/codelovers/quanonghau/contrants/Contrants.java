@@ -42,7 +42,7 @@ public class Contrants {
     public static final String RESET_PASSWORD_CONTENT = "Hi [[name]],<br>This is your new password: [[newPassword]]<br>Note: for security reason, you must change your password after logging in.<br>Thank you, Codelover!";
 
     ////////// FOR RESET PASSWORD
-    public static final long EXPIRATION_DATE = 86400; // 1 Day
+    public static final long EXPIRATION_DATE = 86400000; // 1 Day
 
     public static final String RESET_PASSWORD_WEB_SUBJECT = "A request to reset your password";
 

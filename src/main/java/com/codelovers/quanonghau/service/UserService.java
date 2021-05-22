@@ -1,11 +1,13 @@
 package com.codelovers.quanonghau.service;
 
+import com.codelovers.quanonghau.exception.PasswordResetTokenNotFoundException;
 import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
 
@@ -45,5 +47,9 @@ public interface UserService {
     ///
     void createPasswordResetTokenForUser(String token, User user);
 
+    User getUserByPasswordResetToken(String token);
+
     String validatePasswordResetToken(String token);
+
+    void deletePasswordResetToken(String token) throws PasswordResetTokenNotFoundException;
 }

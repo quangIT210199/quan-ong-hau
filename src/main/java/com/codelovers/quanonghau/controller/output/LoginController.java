@@ -108,15 +108,13 @@ public class LoginController {
     public String getView(@RequestParam(name = "token") String token, Model model) {
 
         String result = userSer.validatePasswordResetToken(token);
-//        if(result != null) {
-//            String message = messages.getMessage("auth.message." + result, null, locale);
-//            return "redirect:/login.html?lang="
-//                    + locale.getLanguage() + "&message=" + message;
-//        } else {
-//            model.addAttribute("token", token);
-//            return "redirect:/updatePassword.html?lang=" + locale.getLanguage();
-//        }
-
-        return "password-reset.html";
+        System.out.println(result);
+        if (result != null) {
+            return "redirect:/login";
+        }
+        else {
+            model.addAttribute("token", token);
+            return "password-reset.html";
+        }
     }
 }

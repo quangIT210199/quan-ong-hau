@@ -7,11 +7,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class NewProductDTO {
+public class NewProductDto {
     private Product product;
     private List<Category> categoryList;
 
-    public NewProductDTO(Product product, List<Category> categoryList) {
+    public NewProductDto(Product product, List<Category> categoryList) {
         this.product = product;
         this.categoryList = categoryList;
     }

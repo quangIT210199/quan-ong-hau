@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class NewCategoryDTO {
+public class NewCategoryDto {
     private Category category;
     private List<Category> listCategories = new ArrayList<>();
 }

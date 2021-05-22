@@ -2,6 +2,9 @@ package com.codelovers.quanonghau.controller;
 
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.controller.input.PasswordReset;
+import com.codelovers.quanonghau.dto.PasswordDto;
+import com.codelovers.quanonghau.exception.PasswordResetTokenNotFoundException;
+import com.codelovers.quanonghau.models.PasswordResetToken;
 import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.configs.CustomUserDetails;
 import com.codelovers.quanonghau.configs.jwt.JwtTokenProvider;
@@ -145,7 +148,6 @@ public class AuthController {
         }
 
         String newPassword = userSer.resetPassword(user);
-        System.out.println("New Password: " + newPassword);
         try {
             sendResetPasswordEMail(newPassword, user);
             return new ResponseEntity<>("Your password has been reset. Please check your e-mail.",HttpStatus.OK);
@@ -191,6 +193,26 @@ public class AuthController {
         sendURLPasswordResetToken(request, token, user);
 
         return new ResponseEntity<>("Your link reset password has been send. Please check your e-mail.",HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/save_password", produces = "application/json")
+    public ResponseEntity<?> savePassword(@Valid @RequestBody PasswordDto passwordDTO) throws PasswordResetTokenNotFoundException {
+        String result = userSer.validatePasswordResetToken(passwordDTO.getToken());
+        System.out.println(passwordDTO.toString());
+        if (result != null) {
+            return new ResponseEntity<>("Error", HttpStatus.NOT_FOUND);
+        }
+
+        User user = userSer.getUserByPasswordResetToken(passwordDTO.getToken());
+        if (user == null) {
+            return new ResponseEntity<>("Error", HttpStatus.NOT_FOUND);
+        }
+
+        userSer.changePassword(user, passwordDTO.getNewPassword());
+        // Delete PasswordReset
+        userSer.deletePasswordResetToken(passwordDTO.getToken());
+
+        return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
     private void sendURLPasswordResetToken(HttpServletRequest request, String token, User user) throws MessagingException, UnsupportedEncodingException {

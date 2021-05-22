@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class EditProductDTO {
+public class EditProductDto {
     private Integer numberOfExistingExtraImages;
     private Product product;
     private List<Category> categoryList = new ArrayList<>();
