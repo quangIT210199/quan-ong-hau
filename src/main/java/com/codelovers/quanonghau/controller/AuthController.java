@@ -209,7 +209,7 @@ public class AuthController {
         }
 
         userSer.changePassword(user, passwordDTO.getNewPassword());
-        // Delete PasswordReset
+        // Delete PasswordReset, need fix
         userSer.deletePasswordResetToken(passwordDTO.getToken());
 
         return new ResponseEntity<>("Success", HttpStatus.OK);
