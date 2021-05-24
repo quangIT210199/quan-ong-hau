@@ -212,7 +212,7 @@ public class AuthController {
         // Delete PasswordReset, need fix
         userSer.deletePasswordResetToken(passwordDTO.getToken());
 
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     private void sendURLPasswordResetToken(HttpServletRequest request, String token, User user) throws MessagingException, UnsupportedEncodingException {

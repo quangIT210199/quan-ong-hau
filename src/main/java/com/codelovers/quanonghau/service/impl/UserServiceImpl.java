@@ -242,9 +242,17 @@ public class UserServiceImpl implements UserService {
     /// For Reset Password
     @Override
     public void createPasswordResetTokenForUser(String token, User user) {
-        PasswordResetToken passwordResetToken = new PasswordResetToken(token, user);
-        passwordResetToken.setExpiryDate(new Date(System.currentTimeMillis() + Contrants.EXPIRATION_DATE));
-        passwordResetTokenRepo.save(passwordResetToken);
+        PasswordResetToken passwordReset = passwordResetTokenRepo.findByUserId(user.getId());
+
+        if (passwordReset != null) {
+            passwordReset.setExpiryDate(new Date(System.currentTimeMillis() + Contrants.EXPIRATION_DATE));
+            passwordReset.setToken(token);
+        } else {
+            passwordReset = new PasswordResetToken(token, user);
+            passwordReset.setExpiryDate(new Date(System.currentTimeMillis() + Contrants.EXPIRATION_DATE));
+        }
+
+        passwordResetTokenRepo.save(passwordReset);
     }
 
     @Override
