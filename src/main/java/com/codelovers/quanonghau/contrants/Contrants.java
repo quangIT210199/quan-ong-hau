@@ -8,13 +8,15 @@ public class Contrants {
 
     public static final int USERS_PER_PAGE = 5;
 
-    public static final int PRODUCT_PER_PAGE = 10;
+    public static final int PRODUCT_PER_PAGE = 5;
 
     public static final int SEARCH_PRODUCT_PER_PAGE = 10;
 
     public static final int ROOT_CATEGORIES_PER_PAGE = 5;
 
     public static final int BILL_PER_PAGE = 5;
+
+    public static final int BRAND_PER_PAGE = 5;
 
     ///////////////////// FOR MAIL
     public static final String MAIL_FROM = "truongnv2026@gmail.com";

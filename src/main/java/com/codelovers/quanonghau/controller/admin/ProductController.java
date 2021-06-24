@@ -2,17 +2,19 @@ package com.codelovers.quanonghau.controller.admin;
 
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.controller.output.admin.PagingProduct;
-import com.codelovers.quanonghau.dto.EditProductDto;
-import com.codelovers.quanonghau.dto.NewProductDto;
+import com.codelovers.quanonghau.dto.EditProductDTO;
+import com.codelovers.quanonghau.dto.NewProductDTO;
+import com.codelovers.quanonghau.models.Brand;
 import com.codelovers.quanonghau.models.Category;
 import com.codelovers.quanonghau.models.Product;
 import com.codelovers.quanonghau.exception.ProductNotFoundException;
 import com.codelovers.quanonghau.export.ProductPdfExporter;
 import com.codelovers.quanonghau.help.ProductSaveHelper;
+import com.codelovers.quanonghau.service.BrandService;
 import com.codelovers.quanonghau.service.CategoryService;
 import com.codelovers.quanonghau.service.ProductService;
 import com.codelovers.quanonghau.utils.FileUploadUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.google.zxing.WriterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,6 +37,9 @@ public class ProductController {
     @Autowired
     private CategoryService categorySer;
 
+    @Autowired
+    private BrandService brandSer;
+
     @GetMapping(value = "/products", produces = "application/json")
     public ResponseEntity<?> listAllProdut() {
 
@@ -51,12 +56,11 @@ public class ProductController {
                                          @RequestParam(value = "sortField") String sortField,
                                          @RequestParam(value = "sortDir") String sortDir,
                                          @RequestParam(value = "keyword") String keyword,
-                                         @RequestParam(value = "categoryID") Integer categoryID) {
+                                         @RequestParam(value = "categoryID", required = false) Integer categoryID) {
         Page<Product> page = productSer.listByPage(pageNum, sortField, sortDir, keyword, categoryID);
         // Using Search with Product => Get all list categories
         List<Category> listCategories = categorySer.listCategoryUsedInForm();
 
-        System.out.println("Category is Selected id: " + categoryID);
         List<Product> listProduct = page.getContent();
         long startCount = (pageNum - 1) * Contrants.PRODUCT_PER_PAGE + 1; // Start at index element
         long endCount = startCount + Contrants.PRODUCT_PER_PAGE - 1; // Index of End element
@@ -90,34 +94,35 @@ public class ProductController {
     // Need code DTO for return json use for Form Product
     @GetMapping(value = "/product/new", produces = "application/json")
     public ResponseEntity<?> newProduct() {
-        List<Category> categoryList = categorySer.listAll();
+        List<Brand> brandList = brandSer.listAllForForm();
 
         Product product = new Product();
         product.setEnabled(true);
         product.setInStock(true);
 
-        NewProductDto newProductDTO = new NewProductDto(product, categoryList);
+        NewProductDTO newProductDTO = new NewProductDTO();
+        newProductDTO.setProduct(product);
+        newProductDTO.setBrandList(brandList);
 
         return new ResponseEntity<>(newProductDTO, HttpStatus.OK);
     }
 
     // Cần tách ra làm 2 API
-    @PostMapping(value = "/product/save", produces = "application/json")
+    @PostMapping(value = "/product/save", produces = "application/json", consumes = {"multipart/form-data"})
     public ResponseEntity<?> saveProduct(String productJson,
-                                         @RequestParam(value = "fileImage", required = false) MultipartFile mainImage,
-                                         @RequestParam(value = "extraImage", required = false) MultipartFile[] extraImage,
-                                         @RequestParam(value = "detailIDs", required = false) String[] detailIDs,
-                                         @RequestParam(value = "detailNames", required = false) String[] detailNames,
-                                         @RequestParam(value = "detailValues", required = false) String[] detailValues,
-                                         @RequestParam(value = "imageIDs", required = false) String[] imageIDs,
-                                         @RequestParam(value = "imageNames", required = false) String[] imageNames,
-                                         @RequestParam(value = "heightQR", defaultValue = "200") Integer heightQR,
-                                         @RequestParam(value = "widthQR", defaultValue = "200") Integer widthQR) throws IOException, WriterException {
-        ObjectMapper mapper = new ObjectMapper();
-        Product product = mapper.readValue(productJson, Product.class);
+                                         @RequestParam(name = "fileImage", required = false) MultipartFile fileImage,
+                                         @RequestParam(name = "extraImage", required = false) List<MultipartFile> extraImage,
+                                         @RequestParam(name = "detailIDs", required = false) String[] detailIDs,
+                                         @RequestParam(name = "detailNames", required = false) String[] detailNames,
+                                         @RequestParam(name = "detailValues", required = false) String[] detailValues,
+                                         @RequestParam(name = "imageIDs", required = false) String[] imageIDs,
+                                         @RequestParam(name = "imageNames", required = false) String[] imageNames,
+                                         @RequestParam(name = "heightQR", defaultValue = "200") Integer heightQR,
+                                         @RequestParam(name = "widthQR", defaultValue = "200") Integer widthQR) throws IOException, WriterException {
+        Gson gson = new Gson();
+        Product product = gson.fromJson(productJson, Product.class);
 
-        ProductSaveHelper.setMainImageName(mainImage, product);
-
+        ProductSaveHelper.setMainImageName(fileImage, product);
         ProductSaveHelper.setExistingExtraImageNames(imageIDs, imageNames, product); // Set image for Extra Image already have in server
 
         ProductSaveHelper.setNewExtraImageNames(extraImage, product); // Set newExtraImage to the Set collection
@@ -130,7 +135,7 @@ public class ProductController {
         // Save QR code
         ProductSaveHelper.saveUploadQRCode(savedProduct, heightQR, widthQR);
 
-        ProductSaveHelper.saveUploadImages(mainImage, extraImage, savedProduct);
+        ProductSaveHelper.saveUploadImages(fileImage, extraImage, savedProduct);
 
         ProductSaveHelper.deleteExtraImagesWereRemovedOnForm(product);
 
@@ -138,9 +143,9 @@ public class ProductController {
     }
 
     // Get Infomation Product when scanner QRCode image
-    @GetMapping(value = "/product/{id}/{name}")
-    public ResponseEntity<?> getProductByQRCode(@PathVariable(name = "id") Integer id,
-                                               @PathVariable(name = "name") String name) {
+    @GetMapping(value = "/product")
+    public ResponseEntity<?> getProductByQRCode(@RequestParam(name = "id") Integer id,
+                                               @RequestParam(name = "name") String name) {
         Product product = productSer.findByIdAndName(id, name);
         if (product == null) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -155,12 +160,12 @@ public class ProductController {
     public ResponseEntity<?> editProduct(@RequestParam(value = "id") Integer id) {
         try {
             Product product = productSer.get(id);
-            List<Category> categoryList = categorySer.listAll();
+            List<Brand> brandList = brandSer.listAllForForm();
             Integer numberOfExistingExtraImages = product.getImages().size();
 
-            EditProductDto editProductDTO = new EditProductDto();
+            EditProductDTO editProductDTO = new EditProductDTO();
             editProductDTO.setProduct(product);
-            editProductDTO.setCategoryList(categoryList);
+            editProductDTO.setBrandList(brandList);
             editProductDTO.setNumberOfExistingExtraImages(numberOfExistingExtraImages);
 
             return new ResponseEntity<>(editProductDTO, HttpStatus.OK);
@@ -197,7 +202,7 @@ public class ProductController {
             FileUploadUtil.removeDir(productExtraImagesDir);
             FileUploadUtil.removeDir(productImagesDir);
 
-            return new ResponseEntity<>("Delete success", HttpStatus.OK);
+            return new ResponseEntity<>(id, HttpStatus.OK);
         } catch (ProductNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
@@ -221,6 +226,5 @@ public class ProductController {
         } catch (ProductNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-
     }
 }

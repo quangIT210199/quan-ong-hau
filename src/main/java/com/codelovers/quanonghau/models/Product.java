@@ -38,6 +38,7 @@ public class Product implements Serializable {
     @Column(name = "updated_time")
     private Date updatedTime;
 
+    @Column(name = "enabled")
     private boolean enabled;
 
     @Column(name = "price")
@@ -63,12 +64,16 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductDetails> details = new ArrayList<>(); // Sản phẩm cần tham chiếu tới các Chi tiết nên cần sử dụng
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)// nghi vấn
     private List<CartItem> cartItems = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne // unidirectional : tham chiếu 1 chiều
     @JoinColumn(name = "category_id")
     private Category category; // tham chiếu khóa ngoại
+
+    @ManyToOne
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
 
     public Product() {
     }
@@ -121,6 +126,9 @@ public class Product implements Serializable {
 
     @Transient
     public String getShortName() {
+        if (name == null) {
+            return "";
+        }
         if (name.length() > 70) {
             return name.substring(0, 70).concat("...");
         }
@@ -257,13 +265,13 @@ public class Product implements Serializable {
         this.details = details;
     }
 
-    public List<CartItem> getCartItems() {
-        return cartItems;
-    }
-
-    public void setCartItems(List<CartItem> cartItems) {
-        this.cartItems = cartItems;
-    }
+//    public List<CartItem> getCartItems() {
+//        return cartItems;
+//    }
+//
+//    public void setCartItems(List<CartItem> cartItems) {
+//        this.cartItems = cartItems;
+//    }
 
     public Category getCategory() {
         return category;

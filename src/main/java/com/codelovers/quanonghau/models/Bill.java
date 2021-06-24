@@ -26,7 +26,18 @@ public class Bill implements Serializable {
     @Column(name = "enabled")
     private boolean enabled;
 
+    @Column(name ="amount_bill")
+    private Float amountBill;
+
     public Bill() {
+    }
+
+    public Float getAmountBill() {
+        return amountBill;
+    }
+
+    public void setAmountBill(Float amountBill) {
+        this.amountBill = amountBill;
     }
 
     public Integer getId() {

@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ProductSaveHelper {
@@ -39,8 +40,8 @@ public class ProductSaveHelper {
         product.setImages(images); // Vì giá trị ProductImage lưu trong Set, lên khi thay đổi thì chúng sẽ bị tác động
     }
 
-    public static void setNewExtraImageNames(MultipartFile[] extraImageFiles, Product product) {
-        if (extraImageFiles.length > 0) {
+    public static void setNewExtraImageNames(List<MultipartFile> extraImageFiles, Product product) {
+        if (extraImageFiles.size() > 0) {
             for (MultipartFile multipartFile : extraImageFiles) {
                 if (!multipartFile.isEmpty()) {
                     String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
@@ -74,7 +75,7 @@ public class ProductSaveHelper {
         }
     }
 
-    public static void saveUploadImages(MultipartFile mainImage, MultipartFile[] extraImage, Product savedProduct) throws IOException {
+    public static void saveUploadImages(MultipartFile mainImage, List<MultipartFile> extraImage, Product savedProduct) throws IOException {
         if (!mainImage.isEmpty()) {
             String fileName = StringUtils.cleanPath(mainImage.getOriginalFilename());
             String uploadDir = "images/product-photo/" + savedProduct.getId();
@@ -83,7 +84,7 @@ public class ProductSaveHelper {
             FileUploadUtil.saveFile(uploadDir, fileName, mainImage);
         }
 
-        if (extraImage.length > 0) {
+        if (extraImage.size() > 0) {
             String uploadDir = "images/product-photo/" + savedProduct.getId() + "/extras/";
 
             for (MultipartFile multipartFile : extraImage) {

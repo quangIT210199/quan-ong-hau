@@ -158,7 +158,7 @@ public class UserServiceImpl implements UserService {
     public User updateAccount(User userInForm) {
         User userInDB = userRepo.findById(userInForm.getId()).get();
 
-        if (!userInForm.getPassword().isEmpty()) {
+        if (userInForm.getPassword() != null && !userInForm.getPassword().isEmpty()) {
             userInDB.setPassword(userInForm.getPassword());
             encodePassword(userInDB);
         }
@@ -234,6 +234,8 @@ public class UserServiceImpl implements UserService {
         user.setPassword(randomPassword);
 
         encodePassword(user);
+
+        System.out.println("Password " + user.getPassword());
         userRepo.save(user);
 
         return randomPassword;

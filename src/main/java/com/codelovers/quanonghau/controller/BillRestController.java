@@ -93,7 +93,7 @@ public class BillRestController {
     public ResponseEntity<?> createBill(@RequestBody Integer[] cartIds,
                                         @AuthenticationPrincipal CustomUserDetails loggedUser) throws ParseException {
         User user = loggedUser.getUser();
-
+        float amountBill = 0;
         if (cartIds.length - 1 < 0) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -104,17 +104,22 @@ public class BillRestController {
             if (cartItem.getBill() != null) {
                 return new ResponseEntity<>("Khong hợp lệ", HttpStatus.NO_CONTENT);
             }
+
+            amountBill += cartItem.getSubtotal();
         }
 
         Bill b = new Bill();
         Bill bill = billSer.createBill(b);
+        bill.setAmountBill(amountBill);
+
+        System.out.println("Tổng tiền Bill: " + bill.getAmountBill());
 
         Integer billId = bill.getId();
         System.out.println("ID của Bill: " + billId);
         // Set billId in CardItem
         cartItemSer.updateBillId(billId, cartIds);
-
-        return new ResponseEntity<>("Tạo Bill thành công!", HttpStatus.OK);
+        System.out.println("Thành công");
+        return new ResponseEntity<>(billId, HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")

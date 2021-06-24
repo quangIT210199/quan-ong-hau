@@ -2,6 +2,7 @@ package com.codelovers.quanonghau.controller.admin;
 
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.controller.output.admin.PagingUser;
+import com.codelovers.quanonghau.models.CartItem;
 import com.codelovers.quanonghau.models.Role;
 import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.exception.UserNotFoundException;
@@ -11,6 +12,7 @@ import com.codelovers.quanonghau.service.RoleService;
 import com.codelovers.quanonghau.service.UserService;
 import com.codelovers.quanonghau.utils.FileUploadUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -36,6 +38,11 @@ public class UserController {
 
     @Autowired
     RoleService roleSer;
+
+    @GetMapping(value = "/users", produces = "application/json")
+    public ResponseEntity<?> listAllUser() {
+        return new ResponseEntity<>(userSer.listAll(), HttpStatus.OK);
+    }
 
     @GetMapping(value = "/user/firstPage", produces = "application/json")
     public ResponseEntity<?> listFirstPage() {
@@ -146,11 +153,10 @@ public class UserController {
     // User user is must input form-data
     @PostMapping(value = "/user/save", consumes = {"multipart/form-data"}, produces = "application/json")
     public ResponseEntity<?> saveUser(String userJson, @RequestParam(name = "imageFile") MultipartFile file) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = objectMapper.readValue(userJson, User.class);
-        User savedUser = null;
-        System.out.println(user.getRoles());
+        Gson gson = new Gson();
+        User user = gson.fromJson(userJson, User.class);
 
+        User savedUser = null;
         if (!file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
@@ -192,15 +198,14 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "/user/delete/{id}", produces = "application/json")
-    public ResponseEntity<?> removeUser(@PathVariable("id") Integer id) {
-
+    @GetMapping(value = "/user/delete", produces = "application/json")
+    public ResponseEntity<?> removeUser(@RequestParam("id") Integer id) {
         try {
             userSer.deleteUser(id);
             String userDir = "images/user-photo/" + id;
 
             FileUploadUtil.removeDir(userDir);
-            return new ResponseEntity<>("Delete done" + id, HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>("Delete success User", HttpStatus.OK);
         } catch (UserNotFoundException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }

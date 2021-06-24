@@ -16,6 +16,7 @@ public class StaticResourceConfiguration extends WebMvcConfigurerAdapter {
         exposeDirectory("images/category-photo", registry);
         exposeDirectory("images/user-photo", registry);
         exposeDirectory("images/product-photo", registry);
+        exposeDirectory("images/brand-photo", registry);
     }
 
     private void exposeDirectory(String pathPattern, ResourceHandlerRegistry registry) {

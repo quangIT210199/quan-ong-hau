@@ -1,12 +1,27 @@
 package com.codelovers.quanonghau.configs.payload;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
 import java.util.List;
 
-public class LoginResponse {
+public class LoginResponse implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @SerializedName("accessToken")
     private String accessToken;
+
+    @SerializedName("tokenType")
     private String tokenType = "Bearer";
+
+    @SerializedName("id")
     private Integer id;
+
+    @SerializedName("username")
     private String username;
+
+    @SerializedName("roles")
     private List<String> roles;
 
     public LoginResponse(String accessToken, Integer id, String username, List<String> roles) {

@@ -13,8 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends PagingAndSortingRepository<User, Integer> {
 
-    @Query("SELECT u FROM User u WHERE u.email = :email")
-    User getUserByEmail(@Param("email") String email);
+    @Query("SELECT u FROM User u WHERE u.email = ?1")
+    User getUserByEmail( String email);
 
     Boolean existsByEmail(String email);
 

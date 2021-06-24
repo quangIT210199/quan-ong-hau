@@ -85,8 +85,8 @@ public class ProductRestController {
         }
     }
 
-    @GetMapping(value = "/search/page/{pageNum}", produces = "application/json")
-    public ResponseEntity<?> searchByPage(@PathVariable("pageNum") Integer pageNum, @RequestParam(name = "keyword") String keyword) {
+    @GetMapping(value = "/search/page", produces = "application/json")
+    public ResponseEntity<?> searchByPage(@RequestParam("pageNum") Integer pageNum, @RequestParam(name = "keyword") String keyword) {
         Page<Product> pageProduct = productSer.search(pageNum, keyword);
         List<Product> resultList = pageProduct.getContent();
 

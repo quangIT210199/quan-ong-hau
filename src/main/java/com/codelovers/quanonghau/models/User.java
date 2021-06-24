@@ -52,8 +52,8 @@ public class User implements Serializable {
     @Column(name = "enabled")
     private boolean enabled;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) // CascadeType.PERSIST: khi thêm sẽ ảnh hưởng tới các modal liên kết
-    List<CartItem> cartItems = new ArrayList<>();
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) // CascadeType.PERSIST: khi thêm sẽ ảnh hưởng tới các modal liên kết
+//    List<CartItem> cartItems = new ArrayList<>();
 
     //    @JsonIgnore @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Fetch(FetchMode.JOIN)
@@ -173,13 +173,13 @@ public class User implements Serializable {
         this.enabled = enabled;
     }
 
-    public List<CartItem> getCartItems() {
-        return cartItems;
-    }
-
-    public void setCartItems(List<CartItem> cartItems) {
-        this.cartItems = cartItems;
-    }
+//    public List<CartItem> getCartItems() {
+//        return cartItems;
+//    }
+//
+//    public void setCartItems(List<CartItem> cartItems) {
+//        this.cartItems = cartItems;
+//    }
 
     public Set<Role> getRoles() {
         return roles;

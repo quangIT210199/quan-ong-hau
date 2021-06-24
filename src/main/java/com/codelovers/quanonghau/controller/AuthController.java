@@ -2,9 +2,9 @@ package com.codelovers.quanonghau.controller;
 
 import com.codelovers.quanonghau.contrants.Contrants;
 import com.codelovers.quanonghau.controller.input.PasswordReset;
-import com.codelovers.quanonghau.dto.PasswordDto;
+import com.codelovers.quanonghau.dto.PasswordDTO;
 import com.codelovers.quanonghau.exception.PasswordResetTokenNotFoundException;
-import com.codelovers.quanonghau.models.PasswordResetToken;
+import com.codelovers.quanonghau.models.Role;
 import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.configs.CustomUserDetails;
 import com.codelovers.quanonghau.configs.jwt.JwtTokenProvider;
@@ -32,7 +32,9 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -51,7 +53,7 @@ public class AuthController {
     @Autowired
     private RoleService roleSer;
 
-    @PostMapping(value = "/login", produces = "application/json")
+    @PostMapping(value = "/login", produces = "application/json", consumes = "application/json")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         // Validate username and password using spring authenticate
@@ -73,7 +75,7 @@ public class AuthController {
         List<String> roles = customUserDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
-
+        System.out.println("Login success");
         return new ResponseEntity<>(new LoginResponse(jwt,
                 customUserDetails.getUser().getId(), customUserDetails.getUsername(), roles), HttpStatus.OK);
     }
@@ -99,6 +101,45 @@ public class AuthController {
         sendVerificationEmail(request, user);
 
         return new ResponseEntity<>("Registration success", HttpStatus.OK);
+    }
+
+    // Tạo USER mới để test
+    @PostMapping(value = "/create", produces = "application/json")
+    public ResponseEntity<?> createUser(@Validated @RequestBody SignupRequest signupRequest) {
+        if (userSer.exitUserByEmail(signupRequest.getEmail())) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        User user = new User(signupRequest.getEmail(), signupRequest.getPassword(), signupRequest.getFirstName(), signupRequest.getLastName());
+
+        Set<String> listRole = signupRequest.getRole();
+
+        Set<Role> roles = new HashSet<>();
+
+        if (listRole == null) {
+            Role userRole = roleSer.findByName(Contrants.USER);
+            roles.add(userRole);
+        } else {
+            listRole.forEach(role -> {
+                switch (role) {
+                    case "ADMIN":
+                        Role roleAdmin = roleSer.findByName(Contrants.ADMIN);
+                        roles.add(roleAdmin);
+                        break;
+                    default:
+                        Role userRole = roleSer.findByName(Contrants.USER);
+                        roles.add(userRole);
+                        break;
+                }
+            });
+        }
+
+        user.setRoles(roles);
+        user.setEnabled(true);
+
+        userSer.createdUser(user);
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     private void sendVerificationEmail(HttpServletRequest request, User user) throws UnsupportedEncodingException, MessagingException {
@@ -140,17 +181,20 @@ public class AuthController {
     }
 
     // Forgot Password API for App
-    @PostMapping(value = "/reset_password", produces = "application/json")
+    @PostMapping(value = "/reset_password", produces = "application/json", consumes = "application/json")
     public ResponseEntity<?> resetPassword(@RequestBody PasswordReset email) throws UnsupportedEncodingException {
         User user = userSer.getUserByEmail(email.getEmail());
+
         if (user == null) {
             return new ResponseEntity<>("There were an error", HttpStatus.NOT_FOUND);
         }
 
         String newPassword = userSer.resetPassword(user);
+        System.out.println("Mat khau moi la: " + newPassword);
         try {
             sendResetPasswordEMail(newPassword, user);
-            return new ResponseEntity<>("Your password has been reset. Please check your e-mail.",HttpStatus.OK);
+            return new ResponseEntity<>(email,HttpStatus.OK);
+//            return new ResponseEntity<>("Your password has been reset. Please check your e-mail.",HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("There were an error",HttpStatus.OK);
         }
@@ -196,7 +240,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/save_password", produces = "application/json")
-    public ResponseEntity<?> savePassword(@Valid @RequestBody PasswordDto passwordDTO) throws PasswordResetTokenNotFoundException {
+    public ResponseEntity<?> savePassword(@Valid @RequestBody PasswordDTO passwordDTO) throws PasswordResetTokenNotFoundException {
         String result = userSer.validatePasswordResetToken(passwordDTO.getToken());
         System.out.println(passwordDTO.toString());
         if (result != null) {
@@ -212,7 +256,7 @@ public class AuthController {
         // Delete PasswordReset, need fix
         userSer.deletePasswordResetToken(passwordDTO.getToken());
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(passwordDTO, HttpStatus.OK);
     }
 
     private void sendURLPasswordResetToken(HttpServletRequest request, String token, User user) throws MessagingException, UnsupportedEncodingException {

@@ -22,18 +22,27 @@ public class JwtAuthorityEntryPoint implements AuthenticationEntryPoint, Seriali
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> errors = new HashMap<>();
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        Map<String, Object> errors = new HashMap<>();
+//
+//        Clock clock = Clock.systemDefaultZone();
+//        Instant instant = clock.instant();
+//
+//        errors.put("timestamp", instant.toString());
+//        errors.put("message", "Somethings wrong!");
+//
+//        response.setContentType("application/json;charset=UTF-8");
+//        response.setStatus(401);
+//        response.getWriter().write(objectMapper.writeValueAsString(errors));
 
-        Clock clock = Clock.systemDefaultZone();
-        Instant instant = clock.instant();
+        final String expired = (String) request.getAttribute("expired");
+        System.out.println(expired);
+        if (expired!=null){
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,expired);
+        }else{
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Invalid Login details");
+        }
 
-        errors.put("timestamp", instant.toString());
-        errors.put("message", "Somethings wrong!");
-
-        response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(401);
-        response.getWriter().write(objectMapper.writeValueAsString(errors));
 //        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 //                "You need to provide the JWT Token to Access This resource");
     }

@@ -5,6 +5,7 @@ import com.codelovers.quanonghau.models.User;
 import com.codelovers.quanonghau.configs.CustomUserDetails;
 import com.codelovers.quanonghau.service.UserService;
 import com.codelovers.quanonghau.utils.FileUploadUtil;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,28 +37,32 @@ public class AccountController {
     }
 
     @PostMapping(value = "/account/updateInfo", produces = "application/json")
-    public ResponseEntity<?> saveDetail(User user, @RequestParam(name = "imageFile") MultipartFile file,
+    public ResponseEntity<?> saveDetail(String userJson, @RequestParam(name = "imageFile") MultipartFile file,
                                         @AuthenticationPrincipal CustomUserDetails loggerUser) throws IOException {
+        // Dùng cho multipartFile phải vậy, vì n ko cho truyền cùng Object
+        Gson gson = new Gson();
+        User user = gson.fromJson(userJson, User.class);
+        System.out.println(user.getId());
+        User savedUser = null;
         if (!file.isEmpty()) {
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
             user.setPhotos(fileName);
-            User savedUser = userSer.updateAccount(user);
+            savedUser = userSer.updateAccount(user);
 
             String uploadDir = "images/user-photo/" + savedUser.getId();
 
             FileUploadUtil.cleanDir(uploadDir);
             FileUploadUtil.saveFile(uploadDir, fileName, file);
         } else {
-            if (user.getPhotos().isEmpty()) user.setPhotos(null);
+            if (user.getPhotos() == null || user.getPhotos().isEmpty()) user.setPhotos(null);
 
-            userSer.updateAccount(user);
+            savedUser = userSer.updateAccount(user);
         }
 
-        loggerUser.setFirstName(user.getFirstName());
-        loggerUser.setLastName(user.getLastName());
+        loggerUser.setFirstName(savedUser.getFirstName());
+        loggerUser.setLastName(savedUser.getLastName());
 
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(savedUser, HttpStatus.OK);
     }
 
     @PostMapping(value = "/account/updatePass", produces = "application/json")
@@ -71,7 +76,7 @@ public class AccountController {
 
             userSer.changePassword(loggerUser.getUser(), password.getNewPassword());
         }
-
-        return new ResponseEntity<>("Update password success", HttpStatus.OK);
+        System.out.println("Đổi thành công");
+        return new ResponseEntity<>(password, HttpStatus.OK);
     }
 }

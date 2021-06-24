@@ -43,7 +43,9 @@ public class ShoppingCartRestController {
         User user = customUserDetails.getUser();
 
         List<CartItem> cartItems = cartItemSer.listCartItems(user);
-
+        for (CartItem cartItem : cartItems) {
+            System.out.println(cartItem.getProduct().getName());
+        }
         if (cartItems.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -51,9 +53,9 @@ public class ShoppingCartRestController {
     }
 
     // Fix code, beacase value uid dont need when code authen
-    @GetMapping(value = "/cart/add/{pid}/{qty}", produces = "application/json")
-    public ResponseEntity<?> addProductToCart(@PathVariable(name = "pid") Integer pid,
-                                              @PathVariable(name = "qty") Integer qty, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    @GetMapping(value = "/cart/add", produces = "application/json")
+    public ResponseEntity<?> addProductToCart(@RequestParam(name = "pid") Integer pid,
+                                              @RequestParam(name = "qty") Integer qty, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 //        if(authentication == null || authentication instanceof AnonymousAuthenticationToken){
 //            System.out.println("Null?");
 //            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -67,7 +69,7 @@ public class ShoppingCartRestController {
             Product product = productSer.findById(pid);
 
             Integer addedQuantity = cartItemSer.addProduct(pid, qty, user);
-
+            System.out.println("Thành công");
             return new ResponseEntity<>(addedQuantity, HttpStatus.OK);
         } catch (ProductNotFoundException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
@@ -76,9 +78,9 @@ public class ShoppingCartRestController {
 
     // Fix code, beacase value uid dont need when code authen : /cart/update/{pid}/{qty}
     // Calculator when click button
-    @PostMapping(value = "/cart/update/{pid}/{qty}", produces = "application/json")
-    public ResponseEntity<?> updateQuantity(@PathVariable(name = "pid") Integer pid,
-                                            @PathVariable(name = "qty") Integer qty, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    @PostMapping(value = "/cart/update", produces = "application/json")
+    public ResponseEntity<?> updateQuantity(@RequestParam(name = "pid") Integer pid,
+                                            @RequestParam(name = "qty") Integer qty, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         // Can check billID co ko. Co thi k dc tang quantity
         if (customUserDetails == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -99,12 +101,12 @@ public class ShoppingCartRestController {
 
         float subTotal = cartItemSer.updateQuantity(qty, pid, user);
         System.out.println("SubTotal = " + subTotal);
-        return new ResponseEntity<>(String.valueOf(subTotal), HttpStatus.OK);
+        return new ResponseEntity<>(qty, HttpStatus.OK);
     }
 
     // Fix code, beacase value uid dont need when code authen : /cart/update/{pid}
-    @GetMapping(value = "/cart/remove/{pid}", produces = "application/json")
-    public ResponseEntity<?> removeProductFromCart(@PathVariable(name = "pid") Integer pid, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    @GetMapping(value = "/cart/remove", produces = "application/json")
+    public ResponseEntity<?> removeProductFromCart(@RequestParam(name = "pid") Integer pid, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         if (customUserDetails == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -116,7 +118,7 @@ public class ShoppingCartRestController {
             Product product = productSer.findById(pid);
 
             cartItemSer.removeProductAndUser(pid, user);
-            return new ResponseEntity<>("Delete succsess", HttpStatus.OK);
+            return new ResponseEntity<>(pid, HttpStatus.OK);
         } catch (ProductNotFoundException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
